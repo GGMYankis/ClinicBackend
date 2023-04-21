@@ -25,8 +25,6 @@ namespace Clinica.Controllers
             _dbcontext = _context;
         }
 
-
-
         [HttpGet]
         [Route("Lista")]
         public IActionResult Lista()
@@ -84,30 +82,6 @@ namespace Clinica.Controllers
 
         }
 
-
-        /*
-        [HttpPost]
-        [Route("GuardarAbono")]
-        public IActionResult GuardarAbono([FromBody] Patient objeto)
-        {
-            try
-            {
-                _dbcontext.A.Add(objeto);
-                _dbcontext.SaveChanges();
-
-                return StatusCode(StatusCodes.Status200OK, new { mensaje = "ok" });
-
-            }
-            catch (Exception ex)
-            {
-
-                return StatusCode(StatusCodes.Status200OK, new { mensaje = ex.Message });
-
-            }
-
-        }
-
-        */
 
         [HttpPut]
         [Route("EditarPaciente")]
@@ -262,10 +236,6 @@ namespace Clinica.Controllers
 
         }
 
-
-
-
-
         [HttpPost]
         [Route("Asistencias")]
 
@@ -275,8 +245,6 @@ namespace Clinica.Controllers
             _dbcontext.SaveChanges();
             return Ok("Juan");
         }
-
-
 
         [HttpGet]
         [Route("Calendario")]
@@ -295,11 +263,7 @@ namespace Clinica.Controllers
             }
         }
 
-
-
-
         // filtrar  terapeuta
-
 
         [HttpGet]
         [Route("terapeuta")]
@@ -318,8 +282,6 @@ namespace Clinica.Controllers
             }
         }
 
-
-
         [HttpPost]
         [Route("Fecha")]
         public IActionResult Fecha(Attendance IdAsistencias)
@@ -336,12 +298,8 @@ namespace Clinica.Controllers
             return Ok();
         }
 
-
-
         //  <----------------------------- filtrar citas -------------------------> 
 
-
-      
         [HttpPost]
         [Route("Buscar")]
         public async Task<IActionResult> Buscar(Attendance obj)
@@ -368,8 +326,6 @@ namespace Clinica.Controllers
             return Ok(viewModal);
 
         }
-
-
 
         private async Task<Patient> Filtrar(int? ids)
         {
@@ -451,7 +407,6 @@ namespace Clinica.Controllers
 
             return Ok();
         }
-
 
 
         [HttpPost]

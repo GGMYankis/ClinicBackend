@@ -5,9 +5,6 @@ using Microsoft.EntityFrameworkCore;
 using Nest;
 using System.Data;
 using System.Data.SqlClient;
-
-
-
 namespace Clinica.Controllers
 {
 
@@ -36,7 +33,6 @@ namespace Clinica.Controllers
 
                 using (var conexion = new SqlConnection(cadenaSQL))
                 {
-
                     var cmd = new SqlCommand("sp_EvaluacionProbar", conexion);
                     cmd.Parameters.AddWithValue("IdPatients", obj.IdPatients);
                     cmd.Parameters.AddWithValue("IdTherapy", obj.IdTherapy);
@@ -46,9 +42,7 @@ namespace Clinica.Controllers
                     cmd.CommandType = CommandType.StoredProcedure;
                     conexion.Open();
                     cmd.ExecuteNonQuery();
-
                     idEvaluacion = Convert.ToInt32(cmd.Parameters["Resultado"].Value);
-
                     var cmdRe = new SqlCommand("sp_recurrencia", conexion);
                     cmdRe.Parameters.AddWithValue("FechaInicio", obj.FechaInicio);
                     cmdRe.Parameters.AddWithValue("Repetir", obj.Repetir);
@@ -56,8 +50,6 @@ namespace Clinica.Controllers
                     cmdRe.Parameters.AddWithValue("Dias", obj.Dias);
                     cmdRe.Parameters.AddWithValue("IdEvaluation", idEvaluacion);
                     cmdRe.CommandType = CommandType.StoredProcedure;
-
-
                     cmdRe.ExecuteNonQuery();
 
                 }
