@@ -16,8 +16,10 @@ namespace Clinica.TdTablas
         {
         }
 
+        public virtual DbSet<Abono> Abonos { get; set; } = null!;
         public virtual DbSet<Attendance> Attendances { get; set; } = null!;
         public virtual DbSet<Evaluation> Evaluations { get; set; } = null!;
+        public virtual DbSet<PagosRecurrente> PagosRecurrentes { get; set; } = null!;
         public virtual DbSet<Patient> Patients { get; set; } = null!;
         public virtual DbSet<Producto> Productos { get; set; } = null!;
         public virtual DbSet<Recurrencium> Recurrencia { get; set; } = null!;
@@ -29,11 +31,36 @@ namespace Clinica.TdTablas
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-           
+            if (!optionsBuilder.IsConfigured)
+            {
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
+                optionsBuilder.UseSqlServer("Server=LAPTOP-0D4OERM0 ; DataBase= dbapi; Integrated Security=true");
+            }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Abono>(entity =>
+            {
+                entity.HasKey(e => e.IdBono)
+                    .HasName("PK__Abono__D8053001342879F6");
+
+                entity.ToTable("Abono");
+
+                entity.Property(e => e.IdBono).HasColumnName("idBono");
+
+                entity.Property(e => e.Description)
+                    .HasMaxLength(100)
+                    .IsUnicode(false)
+                    .HasColumnName("description");
+
+                entity.Property(e => e.Fecha).HasColumnType("datetime");
+
+                entity.Property(e => e.IdTherapy).HasColumnName("idTherapy");
+
+                entity.Property(e => e.Monto).HasColumnType("decimal(10, 2)");
+            });
+
             modelBuilder.Entity<Attendance>(entity =>
             {
                 entity.HasKey(e => e.IdAsistencias)
@@ -70,6 +97,25 @@ namespace Clinica.TdTablas
                 entity.Property(e => e.Price)
                     .HasMaxLength(100)
                     .IsUnicode(false);
+
+                entity.Property(e => e.Visitas).HasColumnName("visitas");
+            });
+
+            modelBuilder.Entity<PagosRecurrente>(entity =>
+            {
+                entity.HasNoKey();
+
+                entity.ToTable("pagos_recurrentes");
+
+                entity.Property(e => e.Fecha)
+                    .HasColumnType("datetime")
+                    .HasColumnName("fecha");
+
+                entity.Property(e => e.IdPaciente).HasColumnName("idPaciente");
+
+                entity.Property(e => e.IdTherapia).HasColumnName("idTherapia");
+
+                entity.Property(e => e.Monto).HasColumnType("decimal(10, 2)");
             });
 
             modelBuilder.Entity<Patient>(entity =>
@@ -185,7 +231,7 @@ namespace Clinica.TdTablas
             modelBuilder.Entity<Recurrencium>(entity =>
             {
                 entity.HasKey(e => e.IdRecurrencia)
-                    .HasName("PK__recurren__D2D9B8818B3A9493");
+                    .HasName("PK__recurren__D2D9B8818CC4C38A");
 
                 entity.ToTable("recurrencia");
 
@@ -202,7 +248,7 @@ namespace Clinica.TdTablas
                 entity.HasOne(d => d.IdEvaluationNavigation)
                     .WithMany(p => p.Recurrencia)
                     .HasForeignKey(d => d.IdEvaluation)
-                    .HasConstraintName("FK__recurrenc__IdEva__793DFFAF");
+                    .HasConstraintName("FK__recurrenc__IdEva__0D44F85C");
             });
 
             modelBuilder.Entity<Rol>(entity =>

@@ -75,15 +75,6 @@ namespace Clinica.Controllers
         }
 
 
-
-
-     
-        public static IActionResult ddxxxLista()
-        {
-         
-        }
-
-        
     }
 }
 

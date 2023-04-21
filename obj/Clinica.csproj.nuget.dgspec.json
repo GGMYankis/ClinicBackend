@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\LENOVO\\Desktop\\react-asp\\Clinica\\Clinica\\Clinica.csproj": {}
+    "C:\\Users\\LENOVO\\Documents\\GitHub\\ClinicBackend\\Clinica.csproj": {}
   },
   "projects": {
-    "C:\\Users\\LENOVO\\Desktop\\react-asp\\Clinica\\Clinica\\Clinica.csproj": {
+    "C:\\Users\\LENOVO\\Documents\\GitHub\\ClinicBackend\\Clinica.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\LENOVO\\Desktop\\react-asp\\Clinica\\Clinica\\Clinica.csproj",
+        "projectUniqueName": "C:\\Users\\LENOVO\\Documents\\GitHub\\ClinicBackend\\Clinica.csproj",
         "projectName": "Clinica",
-        "projectPath": "C:\\Users\\LENOVO\\Desktop\\react-asp\\Clinica\\Clinica\\Clinica.csproj",
+        "projectPath": "C:\\Users\\LENOVO\\Documents\\GitHub\\ClinicBackend\\Clinica.csproj",
         "packagesPath": "C:\\Users\\LENOVO\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\LENOVO\\Desktop\\react-asp\\Clinica\\Clinica\\obj\\",
+        "outputPath": "C:\\Users\\LENOVO\\Documents\\GitHub\\ClinicBackend\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\LENOVO\\AppData\\Roaming\\NuGet\\NuGet.Config",

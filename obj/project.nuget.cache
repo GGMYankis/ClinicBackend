@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "O9qdX12G5XK4NmFc0yvgTjA6qEnvBQ0NQtcOiXaoTgUNY8IUHOeuKvlP/oBaFSzzi9vNp3wfu0tzkPT5CHf3Xw==",
+  "dgSpecHash": "nX0Z8SFxsHhum873abZFWluMr3tg7kxysKlqOzUrzlTLAg1a2kpWaiGPZ3T0dMvC8TcLbhaFgvgAk7+oNxbWdg==",
   "success": true,
-  "projectFilePath": "C:\\Users\\LENOVO\\Desktop\\react-asp\\Clinica\\Clinica\\Clinica.csproj",
+  "projectFilePath": "C:\\Users\\LENOVO\\Documents\\GitHub\\ClinicBackend\\Clinica.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\LENOVO\\.nuget\\packages\\elasticsearch.net\\7.17.5\\elasticsearch.net.7.17.5.nupkg.sha512",
     "C:\\Users\\LENOVO\\.nuget\\packages\\humanizer.core\\2.8.26\\humanizer.core.2.8.26.nupkg.sha512",

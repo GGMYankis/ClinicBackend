@@ -26,6 +26,7 @@ namespace Clinica.Controllers
         }
 
 
+
         [HttpGet]
         [Route("Lista")]
         public IActionResult Lista()
@@ -44,9 +45,6 @@ namespace Clinica.Controllers
         }
 
 
-
-
-
         [HttpGet]
         [Route("ListaUsers")]
         public IActionResult ListaUsers()
@@ -63,7 +61,6 @@ namespace Clinica.Controllers
                 return StatusCode(StatusCodes.Status200OK, new { mensaje = ex.Message, Lista });
             }
         }
-
 
 
         [HttpPost]
@@ -88,7 +85,29 @@ namespace Clinica.Controllers
         }
 
 
+        /*
+        [HttpPost]
+        [Route("GuardarAbono")]
+        public IActionResult GuardarAbono([FromBody] Patient objeto)
+        {
+            try
+            {
+                _dbcontext.A.Add(objeto);
+                _dbcontext.SaveChanges();
 
+                return StatusCode(StatusCodes.Status200OK, new { mensaje = "ok" });
+
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(StatusCodes.Status200OK, new { mensaje = ex.Message });
+
+            }
+
+        }
+
+        */
 
         [HttpPut]
         [Route("EditarPaciente")]
@@ -112,23 +131,17 @@ namespace Clinica.Controllers
                 oProducto.NumberMothers = objeto.NumberMothers is null ? oProducto.NumberMothers : objeto.NumberMothers;
                 oProducto.DateOfBirth = objeto.DateOfBirth is null ? oProducto.DateOfBirth : objeto.DateOfBirth;
                 oProducto.Activo = objeto.Activo is null ? oProducto.Activo : objeto.Activo;
-
-
                 oProducto.Age = objeto.Age is null ? oProducto.Age : objeto.Age;
                 oProducto.EducationalInstitution = objeto.EducationalInstitution is null ? oProducto.EducationalInstitution : objeto.EducationalInstitution;
                 oProducto.Course = objeto.Course is null ? oProducto.Course : objeto.Course;
-
                 oProducto.WhoRefers = objeto.WhoRefers is null ? oProducto.WhoRefers : objeto.WhoRefers;
                 oProducto.FamilySettings = objeto.FamilySettings is null ? oProducto.FamilySettings : objeto.FamilySettings;
                 oProducto.TherapiesOrServiceYouWillReceiveAtTheCenter = objeto.TherapiesOrServiceYouWillReceiveAtTheCenter is null ? oProducto.TherapiesOrServiceYouWillReceiveAtTheCenter : objeto.TherapiesOrServiceYouWillReceiveAtTheCenter;
                 oProducto.Diagnosis = objeto.Diagnosis is null ? oProducto.Diagnosis : objeto.Diagnosis;
-
-
                 oProducto.Recommendations = objeto.Recommendations is null ? oProducto.Recommendations : objeto.Recommendations;
                 oProducto.FamilyMembersConcerns = objeto.FamilyMembersConcerns is null ? oProducto.FamilyMembersConcerns : objeto.FamilyMembersConcerns;
                 oProducto.SpecificMedicalCondition = objeto.SpecificMedicalCondition is null ? oProducto.SpecificMedicalCondition : objeto.SpecificMedicalCondition;
                 oProducto.Other = objeto.Other is null ? oProducto.Other : objeto.Other;
-
 
                 _dbcontext.Patients.Update(oProducto);
                 _dbcontext.SaveChanges();
@@ -140,16 +153,11 @@ namespace Clinica.Controllers
             {
 
                 return StatusCode(StatusCodes.Status200OK, new { mensaje = ex.Message });
-
-
             }
 
         }
 
-
-
         // CRUD DE LISTADO DE TERAPIAS
-
 
         [HttpGet]
         [Route("ListaTerapia")]
@@ -167,9 +175,6 @@ namespace Clinica.Controllers
                 return StatusCode(StatusCodes.Status200OK, new { mensaje = ex.Message, Lista });
             }
         }
-
-
-
 
         [HttpPost]
         [Route("CrearTerapia")]
@@ -191,7 +196,6 @@ namespace Clinica.Controllers
             }
 
         }
-
 
         [HttpPost]
         [Route("EditarTerapia")]
@@ -224,8 +228,6 @@ namespace Clinica.Controllers
             }
 
         }
-
-
 
         [HttpPut]
         [Route("EditarAdmin")]
@@ -273,7 +275,6 @@ namespace Clinica.Controllers
             _dbcontext.SaveChanges();
             return Ok("Juan");
         }
-
 
 
 
@@ -340,7 +341,7 @@ namespace Clinica.Controllers
         //  <----------------------------- filtrar citas -------------------------> 
 
 
-
+      
         [HttpPost]
         [Route("Buscar")]
         public async Task<IActionResult> Buscar(Attendance obj)
@@ -433,10 +434,6 @@ namespace Clinica.Controllers
 
             return Ok();
         }
-
-
-
-
         [HttpPost]
         [Route("EliminarTerapia")]
         public IActionResult EliminarTerapia([FromBody] Therapy terapia)
@@ -456,6 +453,29 @@ namespace Clinica.Controllers
         }
 
 
+
+        [HttpPost]
+        [Route("CrearAbono")]
+        public IActionResult CrearAbono([FromBody] Abono objeto)
+        {
+            try
+            {
+                _dbcontext.Abonos.Add(objeto);
+                _dbcontext.SaveChanges();
+
+                return StatusCode(StatusCodes.Status200OK, new { mensaje = "ok" });
+
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(StatusCodes.Status200OK, new { mensaje = ex.Message });
+
+            }
+
+        }
+
+     
 
     }
 }

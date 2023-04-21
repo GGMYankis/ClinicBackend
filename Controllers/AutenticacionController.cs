@@ -34,12 +34,6 @@ namespace Clinica.Controllers
             _dbcontext = dbcontext;
         }
 
-
-
-
-
-
-
         [Authorize]
         [HttpPost]
         [Route("getUserByToken")]
@@ -57,10 +51,6 @@ namespace Clinica.Controllers
             }
         }
 
-
-
-
-
         [HttpPost]
         [Route("Login")]
         public IActionResult Login(User usuario)
@@ -70,16 +60,11 @@ namespace Clinica.Controllers
 
             user = _dbcontext.Users.FirstOrDefault(u => u.Email == usuario.Email && u.Password == usuario.Password);
 
-
-
             if(user == null) {
 
                 return StatusCode(StatusCodes.Status200OK, new { message, user }); ;
 
             }
-
-
-
                 var keyBytes = Encoding.ASCII.GetBytes(secretKey);
                 var claims = new ClaimsIdentity();
                 claims.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Names));
@@ -97,15 +82,9 @@ namespace Clinica.Controllers
 
                 string tokencreado = tokenHandler.WriteToken(tokenConfig);
 
-
                 return StatusCode(StatusCodes.Status200OK, new { tokencreado, user });
            
-          
-
-
         }
-
-
 
     }
 }
