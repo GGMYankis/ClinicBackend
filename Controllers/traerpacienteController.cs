@@ -25,9 +25,6 @@ namespace Clinica.Controllers
             _dbcontext = _context;
         }
 
-
-
-
         [HttpPost]
         [Route("CrearEvaluacion")]
         public IActionResult CrearEvaluacion([FromBody] TdTablas.Evaluation obj)
@@ -79,10 +76,14 @@ namespace Clinica.Controllers
 
 
 
+
      
+        public static IActionResult Lista()
+        {
+         
+        }
 
-
-    
+        
     }
 }
 
