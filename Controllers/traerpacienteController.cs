@@ -7,17 +7,15 @@ using System.Data;
 using System.Data.SqlClient;
 namespace Clinica.Controllers
 {
-
     [EnableCors("ReglasCors")]
     [Route("api/[controller]")]
     [ApiController]
     public class traerpacienteController : ControllerBase
     {
         public readonly dbapiContext _dbcontext;
-
         private readonly string cadenaSQL;
-        public traerpacienteController(IConfiguration config, dbapiContext _context)
-        {
+          public traerpacienteController(IConfiguration config, dbapiContext _context)
+         {
             cadenaSQL = config.GetConnectionString("CadenaSQL");
             _dbcontext = _context;
         }
@@ -26,11 +24,9 @@ namespace Clinica.Controllers
         [Route("CrearEvaluacion")]
         public IActionResult CrearEvaluacion([FromBody] TdTablas.Evaluation obj)
         {
-
             int idEvaluacion = 0;
             try
             {
-
                 using (var conexion = new SqlConnection(cadenaSQL))
                 {
                     var cmd = new SqlCommand("sp_EvaluacionProbar", conexion);
@@ -51,22 +47,14 @@ namespace Clinica.Controllers
                     cmdRe.Parameters.AddWithValue("IdEvaluation", idEvaluacion);
                     cmdRe.CommandType = CommandType.StoredProcedure;
                     cmdRe.ExecuteNonQuery();
-
                 }
-
                 return StatusCode(StatusCodes.Status200OK, new { mensaje = "ok" });
-
             }
             catch (Exception ex)
             {
-
                 return StatusCode(StatusCodes.Status200OK, new { mensaje = ex.Message });
-
             }
-
         }
-
-
     }
 }
 

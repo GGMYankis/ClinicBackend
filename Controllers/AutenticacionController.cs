@@ -1,5 +1,4 @@
-﻿
-using Microsoft.AspNetCore.Cors;
+﻿using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Data.SqlClient;
@@ -23,7 +22,6 @@ namespace Clinica.Controllers
     [ApiController]
     public class AutenticacionController : ControllerBase
     {
-
         private readonly string secretKey;
         private readonly string cadenaSQL;
         public readonly dbapiContext _dbcontext;
@@ -57,35 +55,25 @@ namespace Clinica.Controllers
         {
             User user = new User();
             var message = "Usuario no encontardo";
-
             user = _dbcontext.Users.FirstOrDefault(u => u.Email == usuario.Email && u.Password == usuario.Password);
-
             if(user == null) {
-
                 return StatusCode(StatusCodes.Status200OK, new { message, user }); ;
-
             }
                 var keyBytes = Encoding.ASCII.GetBytes(secretKey);
                 var claims = new ClaimsIdentity();
                 claims.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Names));
                 claims.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Email));
-
                 var tokenDescriptor = new SecurityTokenDescriptor
                 {
                     Subject = claims,
                     Expires = DateTime.UtcNow.AddMinutes(5),
                     SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(keyBytes), SecurityAlgorithms.HmacSha256Signature)
                 };
-
                 var tokenHandler = new JwtSecurityTokenHandler();
                 var tokenConfig = tokenHandler.CreateToken(tokenDescriptor);
-
                 string tokencreado = tokenHandler.WriteToken(tokenConfig);
-
-                return StatusCode(StatusCodes.Status200OK, new { tokencreado, user });
-           
+                return StatusCode(StatusCodes.Status200OK, new { tokencreado, user });      
         }
-
     }
 }
 
