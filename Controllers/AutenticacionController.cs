@@ -76,5 +76,4 @@ namespace Clinica.Controllers
         }
     }
 }
-// yankis
 
