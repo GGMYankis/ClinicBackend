@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace Clinica.GModel
+namespace Clinica.SqlTablas
 {
     public partial class dbapiContext : DbContext
     {
@@ -32,7 +32,7 @@ namespace Clinica.GModel
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            
+           
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -317,7 +317,7 @@ namespace Clinica.GModel
             modelBuilder.Entity<User>(entity =>
             {
                 entity.HasKey(e => e.IdUser)
-                    .HasName("PK__users__B7C92638179DB345");
+                    .HasName("PK__users__B7C9263853D2ED5E");
 
                 entity.ToTable("users");
 
@@ -332,6 +332,10 @@ namespace Clinica.GModel
                     .HasColumnName("direccion");
 
                 entity.Property(e => e.Email)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Label)
                     .HasMaxLength(100)
                     .IsUnicode(false);
 
@@ -351,7 +355,7 @@ namespace Clinica.GModel
                 entity.HasOne(d => d.IdRolNavigation)
                     .WithMany(p => p.Users)
                     .HasForeignKey(d => d.IdRol)
-                    .HasConstraintName("FK__users__IdRol__03BB8E22");
+                    .HasConstraintName("FK__users__IdRol__2334397B");
             });
 
             modelBuilder.Entity<Usuario>(entity =>

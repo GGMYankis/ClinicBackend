@@ -5,6 +5,4 @@
         public List<int>? teras { get; set; }
         public int? id { get; set; }
     }
-
-
 }

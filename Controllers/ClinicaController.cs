@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Clinica.Modelos;
-using Clinica.GModel;
+using Clinica.SqlTablas;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Data;
@@ -14,7 +14,7 @@ using System.Drawing;
 namespace Clinica.Controllers
 {
     [Route("api/[controller]")]
-    [ApiController]
+    [ApiController] 
     public class ClinicaController : ControllerBase
     {
         public readonly dbapiContext _dbcontext;
@@ -42,7 +42,6 @@ namespace Clinica.Controllers
         }
 
 
-
         [HttpGet]
         [Route("Listas")]
         public IActionResult Listas()
@@ -58,13 +57,6 @@ namespace Clinica.Controllers
                 return StatusCode(StatusCodes.Status200OK, new { mensaje = ex.Message, Lista });
             }
         }
-
-
-
-
-
-
-
 
         [HttpGet]
         [Route("ListaUsers")]
@@ -143,34 +135,16 @@ namespace Clinica.Controllers
 
                 return StatusCode(StatusCodes.Status200OK, new { mensaje = ex.Message });
             }
-
         }
 
-        [HttpGet]
-        [Route("ListaTerapia")]
-        public IActionResult ListaTerapia()
-        {
-            List<Therapy> Lista = new List<Therapy>();
-            try
-            {
-                Lista = _dbcontext.Therapies.ToList();
-                return StatusCode(StatusCodes.Status200OK, new { mensaje = "ok", Lista });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status200OK, new { mensaje = ex.Message, Lista });
-            }
-        }
 
+    
         [HttpPost]
         [Route("CrearTerapia")]
         public IActionResult CrearTerapia([FromBody] Therapy objeto)
         {
             try
             {
-
-
-
                 _dbcontext.Therapies.Add(objeto);
                 _dbcontext.SaveChanges();
                 return StatusCode(StatusCodes.Status200OK, new { mensaje = "ok" });
@@ -192,7 +166,6 @@ namespace Clinica.Controllers
             }
             try
             {
-
                 oProducto.Label = objeto.Label is null ? oProducto.Label : objeto.Label;
                 oProducto.Description = objeto.Description is null ? oProducto.Description : objeto.Description;
                 oProducto.Price = objeto.Price is null ? oProducto.Price : objeto.Price;
@@ -209,7 +182,7 @@ namespace Clinica.Controllers
 
         [HttpPut]
         [Route("EditarAdmin")]
-        public IActionResult EditarAdmin([FromBody] GModel.User objeto)
+        public IActionResult EditarAdmin([FromBody] SqlTablas.User objeto)
         {
             User oProducto = _dbcontext.Users.Find(objeto.IdUser);
             if (oProducto == null)
@@ -230,6 +203,7 @@ namespace Clinica.Controllers
             }
         }
 
+       
         [HttpPost]
         [Route("Asistencias")]
         public IActionResult Asistencias([FromBody] Attendance attendance)
@@ -238,6 +212,7 @@ namespace Clinica.Controllers
             _dbcontext.SaveChanges();
             return Ok("Juan");
         }
+
 
         [HttpGet]
         [Route("Calendario")]
@@ -254,8 +229,6 @@ namespace Clinica.Controllers
                 return StatusCode(StatusCodes.Status200OK, new { mensaje = ex.Message, Lista });
             }
         }
-
-
 
         [HttpGet]
         [Route("terapeuta")]
@@ -287,7 +260,76 @@ namespace Clinica.Controllers
             return Ok();
         }
 
+
         //  <----------------------------- filtrar citas -------------------------> 
+
+
+        /*
+          [HttpGet]
+        [Route("ListaTerapia")]
+        public IActionResult ListaTerapia()
+        {
+            List<Therapy> Lista = new List<Therapy>();
+            try
+            {
+                Lista = _dbcontext.Therapies.ToList();
+                return StatusCode(StatusCodes.Status200OK, new { mensaje = "ok", Lista });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status200OK, new { mensaje = ex.Message, Lista });
+            }
+        }
+        */
+
+        [HttpPost]
+        [Route("GuardarUsers")]
+        public IActionResult GuardarUsers([FromBody] User objeto)
+        {
+
+            User oProducto = _dbcontext.Users.Find(objeto.IdUser);
+
+            if (oProducto == null)
+            {
+                return BadRequest("producto no encontrado");
+            }
+            oProducto.Names = objeto.Names is null ? oProducto.Names : objeto.Names;
+            oProducto.Apellido = objeto.Apellido is null ? oProducto.Apellido : objeto.Apellido;
+            oProducto.Telefono = objeto.Telefono is null ? oProducto.Telefono : objeto.Telefono;
+            oProducto.Direccion = objeto.Direccion is null ? oProducto.Direccion : objeto.Direccion;
+            oProducto.Email = objeto.Email is null ? oProducto.Email : objeto.Email;
+            oProducto.Password = objeto.Password is null ? oProducto.Password : objeto.Password;
+            oProducto.IdRol = objeto.IdRol is null ? oProducto.IdRol : objeto.IdRol;
+
+            _dbcontext.Users.Update(oProducto);
+            _dbcontext.SaveChanges();
+            return Ok();
+
+        }
+
+
+        [HttpGet]
+        [Route("ListaTerapia")]
+        public IActionResult ListaTerapia()
+        {
+            List<Probar> viewModal = new List<Probar>();
+            try
+            {
+               var oLista = _dbcontext.Therapies.ToList();
+                foreach (var cita in oLista)
+                {
+                    Probar nuevoObjetao = new Probar();
+                    nuevoObjetao.NombreTerapia = cita;
+                    viewModal.Add(nuevoObjetao);
+                }
+
+                return Ok(viewModal);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status200OK, new { mensaje = ex.Message, viewModal });
+            }
+        }
 
 
         [HttpPost]
@@ -313,22 +355,6 @@ namespace Clinica.Controllers
             return Ok(viewModal);
         }
 
-        [HttpPost]
-        [Route("Probar")]
-        public IActionResult Probar([FromBody] IdtherapistIdtherapy objeto)
-        {
-            try
-            {
-                _dbcontext.IdtherapistIdtherapies.Add(objeto);
-                _dbcontext.SaveChanges();
-                return StatusCode(StatusCodes.Status200OK, new { mensaje = "ok" });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status200OK, new { mensaje = ex.Message });
-            }
-        }
-
 
         [HttpPost]
         [Route("Post")]
@@ -342,8 +368,7 @@ namespace Clinica.Controllers
                 _dbcontext.SaveChanges();
             return Ok();
         }
-    
-      
+     
         [HttpPost]
         [Route("Buscar")]
         public async Task<IActionResult> Buscar(Attendance obj)
@@ -366,28 +391,22 @@ namespace Clinica.Controllers
             }
             return Ok(viewModal);
         }
-
         private async Task<Patient> Filtrar(int? ids)
         {
             var paciente = await _dbcontext.Patients.FindAsync(ids);
             return paciente;
         }
-
-
-
         private async Task<Therapy> FiltrarTerapia(int? idTerapia)
         {
             var Tera = await _dbcontext.Therapies.FindAsync(idTerapia);
             return Tera;
         }
 
-
         private async Task<User> FiltrarTerapeuta(int? idTerapeuta)
         {
             var Terapeuta = await _dbcontext.Users.FindAsync(idTerapeuta);
             return Terapeuta;
         }
-
 
         [HttpPost]
         [Route("TraerUsuario")]
@@ -457,6 +476,7 @@ namespace Clinica.Controllers
                 return StatusCode(StatusCodes.Status200OK, new { mensaje = ex.Message });
             }
 
+         
 
         }
     }

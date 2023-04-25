@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Clinica.GModel
+namespace Clinica.SqlTablas
 {
     public partial class Rol
     {

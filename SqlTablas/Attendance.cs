@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Clinica.GModel
+namespace Clinica.SqlTablas
 {
     public partial class Attendance
     {
-        public int IdAsistencias { get; set; }
+        public int? IdAsistencias { get; set; }
         public int? IdTerapeuta { get; set; }
         public int? IdPatients { get; set; }
         public int? IdTherapy { get; set; }
