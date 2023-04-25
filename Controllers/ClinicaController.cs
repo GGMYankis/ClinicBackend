@@ -1,13 +1,16 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Clinica.Modelos;
-using Clinica.TdTablas;
+using Clinica.GModel;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Data;
 using Microsoft.AspNetCore.Authorization;
 using Nest;
 using static Nest.JoinField;
+using System.Data.SqlClient;
+using System.Drawing;
+
 namespace Clinica.Controllers
 {
     [Route("api/[controller]")]
@@ -15,8 +18,10 @@ namespace Clinica.Controllers
     public class ClinicaController : ControllerBase
     {
         public readonly dbapiContext _dbcontext;
-        public ClinicaController(dbapiContext _context)
+        private readonly string cadenaSQL;
+        public ClinicaController(dbapiContext _context, IConfiguration config)
         {
+            cadenaSQL = config.GetConnectionString("CadenaSQL");
             _dbcontext = _context;
         }
 
@@ -35,6 +40,31 @@ namespace Clinica.Controllers
                 return StatusCode(StatusCodes.Status200OK, new { mensaje = ex.Message, Lista });
             }
         }
+
+
+
+        [HttpGet]
+        [Route("Listas")]
+        public IActionResult Listas()
+        {
+            List<IdtherapistIdtherapy> Lista = new List<IdtherapistIdtherapy>();
+            try
+            {
+                Lista = _dbcontext.IdtherapistIdtherapies.ToList();
+                return StatusCode(StatusCodes.Status200OK, new { mensaje = "ok", Lista });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status200OK, new { mensaje = ex.Message, Lista });
+            }
+        }
+
+
+
+
+
+
+
 
         [HttpGet]
         [Route("ListaUsers")]
@@ -138,6 +168,9 @@ namespace Clinica.Controllers
         {
             try
             {
+
+
+
                 _dbcontext.Therapies.Add(objeto);
                 _dbcontext.SaveChanges();
                 return StatusCode(StatusCodes.Status200OK, new { mensaje = "ok" });
@@ -176,7 +209,7 @@ namespace Clinica.Controllers
 
         [HttpPut]
         [Route("EditarAdmin")]
-        public IActionResult EditarAdmin([FromBody] TdTablas.User objeto)
+        public IActionResult EditarAdmin([FromBody] GModel.User objeto)
         {
             User oProducto = _dbcontext.Users.Find(objeto.IdUser);
             if (oProducto == null)
@@ -222,7 +255,7 @@ namespace Clinica.Controllers
             }
         }
 
-   
+
 
         [HttpGet]
         [Route("terapeuta")]
@@ -256,6 +289,61 @@ namespace Clinica.Controllers
 
         //  <----------------------------- filtrar citas -------------------------> 
 
+
+        [HttpPost]
+        [Route("GetEvaluacionByTerapeuta")]
+        public async Task<IActionResult> GetEvaluacionByTerapeuta(IdtherapistIdtherapy terapeutaId)
+        {
+            List<Probar> viewModal = new List<Probar>();
+            var evaluaciones = await _dbcontext.IdtherapistIdtherapies.Where(e => e.Idterapeuta == terapeutaId.Idterapeuta).ToListAsync();
+
+            if (evaluaciones != null)
+            {
+                foreach (var cita in evaluaciones)
+                {
+                    var idsTerapia = cita.Idtherapia;
+                    var terapia = await FiltrarTerapia(idsTerapia);
+
+                    Probar nuevoObjeto = new Probar();
+                    nuevoObjeto.NombreTerapia = terapia;
+                    viewModal.Add(nuevoObjeto);
+                }
+            }
+
+            return Ok(viewModal);
+        }
+
+        [HttpPost]
+        [Route("Probar")]
+        public IActionResult Probar([FromBody] IdtherapistIdtherapy objeto)
+        {
+            try
+            {
+                _dbcontext.IdtherapistIdtherapies.Add(objeto);
+                _dbcontext.SaveChanges();
+                return StatusCode(StatusCodes.Status200OK, new { mensaje = "ok" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status200OK, new { mensaje = ex.Message });
+            }
+        }
+
+
+        [HttpPost]
+        [Route("Post")]
+        public IActionResult Post(ListaEnteros obj)
+        {
+
+            foreach (var numero in obj.teras)
+            {
+                _dbcontext.IdtherapistIdtherapies.AddRange(new IdtherapistIdtherapy { Idtherapia = numero, Idterapeuta = obj.id });
+            }
+                _dbcontext.SaveChanges();
+            return Ok();
+        }
+    
+      
         [HttpPost]
         [Route("Buscar")]
         public async Task<IActionResult> Buscar(Attendance obj)
@@ -368,6 +456,8 @@ namespace Clinica.Controllers
             {
                 return StatusCode(StatusCodes.Status200OK, new { mensaje = ex.Message });
             }
+
+
         }
     }
 }

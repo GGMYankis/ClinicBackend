@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Clinica.TdTablas
+namespace Clinica.GModel
 {
     public partial class Producto
     {

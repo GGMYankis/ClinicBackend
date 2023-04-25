@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Clinica.TdTablas
+namespace Clinica.GModel
 {
     public partial class Evaluation
     {
@@ -20,6 +20,7 @@ namespace Clinica.TdTablas
         public int? Repetir { get; set; }
         public string? Frecuencia { get; set; }
         public string? Dias { get; set; }
+
 
         public virtual ICollection<Recurrencium> Recurrencia { get; set; }
     }

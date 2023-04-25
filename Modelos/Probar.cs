@@ -1,4 +1,4 @@
-﻿using Clinica.TdTablas;
+﻿using Clinica.GModel;
 
 namespace Clinica.Modelos
 {

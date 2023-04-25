@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="TdTablas\" />
+    <Folder Include="GModel\" />
   </ItemGroup>
 
 </Project>

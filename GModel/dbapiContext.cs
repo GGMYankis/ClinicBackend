@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace Clinica.TdTablas
+namespace Clinica.GModel
 {
     public partial class dbapiContext : DbContext
     {
@@ -19,6 +19,7 @@ namespace Clinica.TdTablas
         public virtual DbSet<Abono> Abonos { get; set; } = null!;
         public virtual DbSet<Attendance> Attendances { get; set; } = null!;
         public virtual DbSet<Evaluation> Evaluations { get; set; } = null!;
+        public virtual DbSet<IdtherapistIdtherapy> IdtherapistIdtherapies { get; set; } = null!;
         public virtual DbSet<PagosRecurrente> PagosRecurrentes { get; set; } = null!;
         public virtual DbSet<Patient> Patients { get; set; } = null!;
         public virtual DbSet<Producto> Productos { get; set; } = null!;
@@ -31,11 +32,7 @@ namespace Clinica.TdTablas
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            if (!optionsBuilder.IsConfigured)
-            {
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("Server=LAPTOP-0D4OERM0 ; DataBase= dbapi; Integrated Security=true");
-            }
+            
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -99,6 +96,17 @@ namespace Clinica.TdTablas
                     .IsUnicode(false);
 
                 entity.Property(e => e.Visitas).HasColumnName("visitas");
+            });
+
+            modelBuilder.Entity<IdtherapistIdtherapy>(entity =>
+            {
+                entity.ToTable("idtherapist_idtherapy");
+
+                entity.Property(e => e.Id).HasColumnName("id");
+
+                entity.Property(e => e.Idterapeuta).HasColumnName("idterapeuta");
+
+                entity.Property(e => e.Idtherapia).HasColumnName("idtherapia");
             });
 
             modelBuilder.Entity<PagosRecurrente>(entity =>
@@ -269,7 +277,7 @@ namespace Clinica.TdTablas
             modelBuilder.Entity<Therapy>(entity =>
             {
                 entity.HasKey(e => e.IdTherapy)
-                    .HasName("PK__therapy__87DD5B7CACE2BC46");
+                    .HasName("PK__therapy__87DD5B7C71673943");
 
                 entity.ToTable("therapy");
 
@@ -281,7 +289,9 @@ namespace Clinica.TdTablas
                     .HasMaxLength(100)
                     .IsUnicode(false);
 
-                entity.Property(e => e.Porcentaje).HasColumnName("porcentaje");
+                entity.Property(e => e.Value)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<Therapy2>(entity =>
