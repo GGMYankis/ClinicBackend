@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace Clinica.SqlTablas
+namespace Clinica.ModelosSql
 {
     public partial class dbapiContext : DbContext
     {
@@ -17,6 +17,7 @@ namespace Clinica.SqlTablas
         }
 
         public virtual DbSet<Abono> Abonos { get; set; } = null!;
+        public virtual DbSet<Accounting> Accountings { get; set; } = null!;
         public virtual DbSet<Attendance> Attendances { get; set; } = null!;
         public virtual DbSet<Evaluation> Evaluations { get; set; } = null!;
         public virtual DbSet<IdtherapistIdtherapy> IdtherapistIdtherapies { get; set; } = null!;
@@ -32,7 +33,7 @@ namespace Clinica.SqlTablas
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-           
+          
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -56,6 +57,24 @@ namespace Clinica.SqlTablas
                 entity.Property(e => e.IdTherapy).HasColumnName("idTherapy");
 
                 entity.Property(e => e.Monto).HasColumnType("decimal(10, 2)");
+            });
+
+            modelBuilder.Entity<Accounting>(entity =>
+            {
+                entity.HasKey(e => e.IdAccounting)
+                    .HasName("PK__Accounti__68C5F8267AA208F7");
+
+                entity.ToTable("Accounting");
+
+                entity.Property(e => e.Amount).HasColumnType("decimal(10, 2)");
+
+                entity.Property(e => e.DateOfInvestment)
+                    .HasColumnType("datetime")
+                    .HasColumnName("Date_of_investment");
+
+                entity.Property(e => e.Descripcion)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<Attendance>(entity =>

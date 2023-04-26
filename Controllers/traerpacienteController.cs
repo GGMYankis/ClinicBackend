@@ -1,4 +1,4 @@
-﻿using Clinica.SqlTablas;
+﻿using Clinica.ModelosSql;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -22,7 +22,7 @@ namespace Clinica.Controllers
 
         [HttpPost]
         [Route("CrearEvaluacion")]
-        public IActionResult CrearEvaluacion([FromBody] SqlTablas.Evaluation obj)
+        public IActionResult CrearEvaluacion([FromBody] ModelosSql.Evaluation obj)
         {
             int idEvaluacion = 0;
             try

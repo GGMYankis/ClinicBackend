@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="SqlTablas\" />
+    <Folder Include="ModelosSql\" />
   </ItemGroup>
 
 </Project>

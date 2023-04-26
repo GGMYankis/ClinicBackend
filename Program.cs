@@ -1,4 +1,4 @@
-using Clinica.SqlTablas;
+using Clinica.ModelosSql;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;

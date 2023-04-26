@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Clinica.Modelos;
-using Clinica.SqlTablas;
+using Clinica.ModelosSql;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Data;
@@ -89,6 +89,25 @@ namespace Clinica.Controllers
                 return StatusCode(StatusCodes.Status200OK, new { mensaje = ex.Message });
             }
         }
+
+
+        [HttpPost]
+        [Route("ContabilidadReportes")]
+        public IActionResult ContabilidadReportes([FromBody] Accounting objeto)
+        {
+            try
+            {
+                _dbcontext.Accountings.Add(objeto);
+                _dbcontext.SaveChanges();
+                return StatusCode(StatusCodes.Status200OK, new { mensaje = "ok" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status200OK, new { mensaje = ex.Message });
+            }
+        }
+
+
 
         [HttpPut]
         [Route("EditarPaciente")]
@@ -182,7 +201,7 @@ namespace Clinica.Controllers
 
         [HttpPut]
         [Route("EditarAdmin")]
-        public IActionResult EditarAdmin([FromBody] SqlTablas.User objeto)
+        public IActionResult EditarAdmin([FromBody] ModelosSql.User objeto)
         {
             User oProducto = _dbcontext.Users.Find(objeto.IdUser);
             if (oProducto == null)
@@ -282,6 +301,47 @@ namespace Clinica.Controllers
         }
         */
 
+
+
+
+        [HttpPost]
+        [Route("CrearUsuario")]
+        public IActionResult ContabilidadReportes([FromBody] User objeto)
+        {
+            try
+            {
+                _dbcontext.Users.Add(objeto);
+                _dbcontext.SaveChanges();
+                return StatusCode(StatusCodes.Status200OK, new { mensaje = "ok" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status200OK, new { mensaje = ex.Message });
+            }
+        }
+
+
+
+        [HttpPost]
+        [Route("EliminarUsuario")]
+        public IActionResult EliminarUsuario([FromBody] User objeto)
+        {
+            try
+            {
+                var usuarioEncontrado = _dbcontext.Users.FirstOrDefault(u => u.IdUser == objeto.IdUser);
+                _dbcontext.Remove(usuarioEncontrado);
+                _dbcontext.SaveChanges();
+                return StatusCode(StatusCodes.Status200OK, new { mensaje = "ok" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status200OK, new { mensaje = ex.Message });
+            }
+        }
+
+
+
+
         [HttpPost]
         [Route("GuardarUsers")]
         public IActionResult GuardarUsers([FromBody] User objeto)
@@ -306,6 +366,8 @@ namespace Clinica.Controllers
             return Ok();
 
         }
+
+
 
 
         [HttpGet]

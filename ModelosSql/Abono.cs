@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Clinica.SqlTablas
+namespace Clinica.ModelosSql
 {
     public partial class Abono
     {
