@@ -453,8 +453,7 @@ namespace Clinica.Controllers
             return Ok(viewModal);
         }
    
-        sim 
-            som
+       
 
         [HttpPost]
         [Route("Buscar")]
