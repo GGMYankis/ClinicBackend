@@ -433,7 +433,7 @@ namespace Clinica.Controllers
             return Ok();
         }
 
-
+     
         [HttpPost]
         [Route("FiltrarGastos")]
         public async Task<IActionResult> FiltrarGastos(Inversion obj)
