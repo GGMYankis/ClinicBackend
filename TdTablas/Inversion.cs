@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Clinica.ModelsSql
+namespace Clinica.TdTablas
 {
     public partial class Inversion
     {
         public int IdAccounting { get; set; }
+        public string? Nombre { get; set; }
         public string? Descripcion { get; set; }
         public decimal? Amount { get; set; }
         public DateTime? DateOfInvestment { get; set; }

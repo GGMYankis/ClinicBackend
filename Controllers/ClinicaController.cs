@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Clinica.Modelos;
-using Clinica.ModelsSql;
+using Clinica.TdTablas;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Data;
@@ -203,7 +203,7 @@ namespace Clinica.Controllers
 
         [HttpPut]
         [Route("EditarAdmin")]
-        public IActionResult EditarAdmin([FromBody] ModelsSql.User objeto)
+        public IActionResult EditarAdmin([FromBody] TdTablas.User objeto)
         {
             User oProducto = _dbcontext.Users.Find(objeto.IdUser);
             if (oProducto == null)
@@ -308,7 +308,7 @@ namespace Clinica.Controllers
 
         [HttpPost]
         [Route("CrearUsuario")]
-        public IActionResult ContabilidadReportes([FromBody] User objeto)
+        public IActionResult CrearUsuario([FromBody] User objeto)
         {
             try
             {
@@ -434,23 +434,33 @@ namespace Clinica.Controllers
         }
 
 
-
         [HttpPost]
         [Route("FiltrarGastos")]
         public async Task<IActionResult> FiltrarGastos(Inversion obj)
         {
+            string mensaje = string.Empty;
             List<Inversion> viewModal = new List<Inversion>();
             var gastos = _dbcontext.Inversions.Where(x => x.DateOfInvestment >= obj.DateOfInvestment && x.DateOfInvestment < obj.EndDate).ToList();
 
-            foreach (var cita in gastos)
+
+            if(gastos.Count != 0)
             {
-                Inversion inversion = new Inversion();
-                inversion.Descripcion = cita.Descripcion;
-                inversion.Amount = cita.Amount;
-                inversion.DateOfInvestment = cita.DateOfInvestment;
-                viewModal.Add(inversion);
+                foreach (var cita in gastos)
+                {
+                    Inversion inversion = new Inversion();
+                    inversion.Descripcion = cita.Descripcion;
+                    inversion.Nombre = cita.Nombre;
+                    inversion.Amount = cita.Amount;
+                    inversion.DateOfInvestment = cita.DateOfInvestment;
+                    viewModal.Add(inversion);
+                }
+                return Ok(viewModal);
+              
             }
-            return Ok(viewModal);
+
+            mensaje = "No hubo Inversión para esta fecha";
+            return StatusCode(StatusCodes.Status200OK, new { mensaje = mensaje });
+
         }
    
        

@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="ModelsSql\" />
+    <Folder Include="TdTablas\" />
   </ItemGroup>
 
 </Project>

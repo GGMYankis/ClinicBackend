@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace Clinica.ModelsSql
+namespace Clinica.TdTablas
 {
     public partial class dbapiContext : DbContext
     {
@@ -33,11 +33,7 @@ namespace Clinica.ModelsSql
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            if (!optionsBuilder.IsConfigured)
-            {
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("Server=LAPTOP-0D4OERM0;DataBase= dbapi; Integrated Security=true");
-            }
+            
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -117,7 +113,7 @@ namespace Clinica.ModelsSql
             modelBuilder.Entity<Inversion>(entity =>
             {
                 entity.HasKey(e => e.IdAccounting)
-                    .HasName("PK__inversio__68C5F826D07226F6");
+                    .HasName("PK__inversio__68C5F826A81A5825");
 
                 entity.ToTable("inversion");
 
@@ -134,6 +130,10 @@ namespace Clinica.ModelsSql
                 entity.Property(e => e.EndDate)
                     .HasColumnType("datetime")
                     .HasColumnName("end_date");
+
+                entity.Property(e => e.Nombre)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<PagosRecurrente>(entity =>
