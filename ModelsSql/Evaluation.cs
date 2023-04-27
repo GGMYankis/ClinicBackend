@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Clinica.ModelosSql
+namespace Clinica.ModelsSql
 {
     public partial class Evaluation
     {
@@ -20,7 +20,6 @@ namespace Clinica.ModelosSql
         public int? Repetir { get; set; }
         public string? Frecuencia { get; set; }
         public string? Dias { get; set; }
-
 
         public virtual ICollection<Recurrencium> Recurrencia { get; set; }
     }

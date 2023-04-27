@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Clinica.Modelos;
-using Clinica.ModelosSql;
+using Clinica.ModelsSql;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Data;
@@ -10,11 +10,12 @@ using Nest;
 using static Nest.JoinField;
 using System.Data.SqlClient;
 using System.Drawing;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Clinica.Controllers
 {
     [Route("api/[controller]")]
-    [ApiController] 
+    [ApiController]
     public class ClinicaController : ControllerBase
     {
         public readonly dbapiContext _dbcontext;
@@ -91,13 +92,14 @@ namespace Clinica.Controllers
         }
 
 
+
         [HttpPost]
         [Route("ContabilidadReportes")]
-        public IActionResult ContabilidadReportes([FromBody] Accounting objeto)
+        public IActionResult ContabilidadReportes([FromBody] Inversion objeto)
         {
             try
             {
-                _dbcontext.Accountings.Add(objeto);
+                _dbcontext.Inversions.Add(objeto);
                 _dbcontext.SaveChanges();
                 return StatusCode(StatusCodes.Status200OK, new { mensaje = "ok" });
             }
@@ -157,7 +159,7 @@ namespace Clinica.Controllers
         }
 
 
-    
+
         [HttpPost]
         [Route("CrearTerapia")]
         public IActionResult CrearTerapia([FromBody] Therapy objeto)
@@ -201,7 +203,7 @@ namespace Clinica.Controllers
 
         [HttpPut]
         [Route("EditarAdmin")]
-        public IActionResult EditarAdmin([FromBody] ModelosSql.User objeto)
+        public IActionResult EditarAdmin([FromBody] ModelsSql.User objeto)
         {
             User oProducto = _dbcontext.Users.Find(objeto.IdUser);
             if (oProducto == null)
@@ -222,7 +224,7 @@ namespace Clinica.Controllers
             }
         }
 
-       
+
         [HttpPost]
         [Route("Asistencias")]
         public IActionResult Asistencias([FromBody] Attendance attendance)
@@ -377,7 +379,7 @@ namespace Clinica.Controllers
             List<Probar> viewModal = new List<Probar>();
             try
             {
-               var oLista = _dbcontext.Therapies.ToList();
+                var oLista = _dbcontext.Therapies.ToList();
                 foreach (var cita in oLista)
                 {
                     Probar nuevoObjetao = new Probar();
@@ -427,10 +429,32 @@ namespace Clinica.Controllers
             {
                 _dbcontext.IdtherapistIdtherapies.AddRange(new IdtherapistIdtherapy { Idtherapia = numero, Idterapeuta = obj.id });
             }
-                _dbcontext.SaveChanges();
+            _dbcontext.SaveChanges();
             return Ok();
         }
-     
+
+
+
+        [HttpPost]
+        [Route("FiltrarGastos")]
+        public async Task<IActionResult> FiltrarGastos(Inversion obj)
+        {
+            List<Inversion> viewModal = new List<Inversion>();
+            var gastos = _dbcontext.Inversions.Where(x => x.DateOfInvestment >= obj.DateOfInvestment && x.DateOfInvestment < obj.EndDate).ToList();
+
+            foreach (var cita in gastos)
+            {
+                Inversion inversion = new Inversion();
+                inversion.Descripcion = cita.Descripcion;
+                inversion.Amount = cita.Amount;
+                inversion.DateOfInvestment = cita.DateOfInvestment;
+                viewModal.Add(inversion);
+            }
+            return Ok(viewModal);
+        }
+   
+
+
         [HttpPost]
         [Route("Buscar")]
         public async Task<IActionResult> Buscar(Attendance obj)
@@ -538,7 +562,15 @@ namespace Clinica.Controllers
                 return StatusCode(StatusCodes.Status200OK, new { mensaje = ex.Message });
             }
 
-         
+
+
+            // filtrar gastos del mes
+
+
+
+
+
+
 
         }
     }

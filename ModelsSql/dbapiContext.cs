@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace Clinica.ModelosSql
+namespace Clinica.ModelsSql
 {
     public partial class dbapiContext : DbContext
     {
@@ -17,10 +17,10 @@ namespace Clinica.ModelosSql
         }
 
         public virtual DbSet<Abono> Abonos { get; set; } = null!;
-        public virtual DbSet<Accounting> Accountings { get; set; } = null!;
         public virtual DbSet<Attendance> Attendances { get; set; } = null!;
         public virtual DbSet<Evaluation> Evaluations { get; set; } = null!;
         public virtual DbSet<IdtherapistIdtherapy> IdtherapistIdtherapies { get; set; } = null!;
+        public virtual DbSet<Inversion> Inversions { get; set; } = null!;
         public virtual DbSet<PagosRecurrente> PagosRecurrentes { get; set; } = null!;
         public virtual DbSet<Patient> Patients { get; set; } = null!;
         public virtual DbSet<Producto> Productos { get; set; } = null!;
@@ -33,7 +33,11 @@ namespace Clinica.ModelosSql
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-          
+            if (!optionsBuilder.IsConfigured)
+            {
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
+                optionsBuilder.UseSqlServer("Server=LAPTOP-0D4OERM0;DataBase= dbapi; Integrated Security=true");
+            }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -57,24 +61,6 @@ namespace Clinica.ModelosSql
                 entity.Property(e => e.IdTherapy).HasColumnName("idTherapy");
 
                 entity.Property(e => e.Monto).HasColumnType("decimal(10, 2)");
-            });
-
-            modelBuilder.Entity<Accounting>(entity =>
-            {
-                entity.HasKey(e => e.IdAccounting)
-                    .HasName("PK__Accounti__68C5F8267AA208F7");
-
-                entity.ToTable("Accounting");
-
-                entity.Property(e => e.Amount).HasColumnType("decimal(10, 2)");
-
-                entity.Property(e => e.DateOfInvestment)
-                    .HasColumnType("datetime")
-                    .HasColumnName("Date_of_investment");
-
-                entity.Property(e => e.Descripcion)
-                    .HasMaxLength(100)
-                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<Attendance>(entity =>
@@ -126,6 +112,28 @@ namespace Clinica.ModelosSql
                 entity.Property(e => e.Idterapeuta).HasColumnName("idterapeuta");
 
                 entity.Property(e => e.Idtherapia).HasColumnName("idtherapia");
+            });
+
+            modelBuilder.Entity<Inversion>(entity =>
+            {
+                entity.HasKey(e => e.IdAccounting)
+                    .HasName("PK__inversio__68C5F826D07226F6");
+
+                entity.ToTable("inversion");
+
+                entity.Property(e => e.Amount).HasColumnType("decimal(10, 2)");
+
+                entity.Property(e => e.DateOfInvestment)
+                    .HasColumnType("datetime")
+                    .HasColumnName("Date_of_investment");
+
+                entity.Property(e => e.Descripcion)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.EndDate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("end_date");
             });
 
             modelBuilder.Entity<PagosRecurrente>(entity =>
