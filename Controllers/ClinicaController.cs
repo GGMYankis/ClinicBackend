@@ -285,10 +285,9 @@ namespace Clinica.Controllers
         //  <----------------------------- filtrar citas -------------------------> 
 
 
-        /*
           [HttpGet]
-        [Route("ListaTerapia")]
-        public IActionResult ListaTerapia()
+        [Route("Moscu")]
+        public IActionResult Moscu()
         {
             List<Therapy> Lista = new List<Therapy>();
             try
@@ -301,7 +300,7 @@ namespace Clinica.Controllers
                 return StatusCode(StatusCodes.Status200OK, new { mensaje = ex.Message, Lista });
             }
         }
-        */
+       
 
 
 
