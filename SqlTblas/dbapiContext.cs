@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace Clinica.TdTablas
+namespace Clinica.SqlTblas
 {
     public partial class dbapiContext : DbContext
     {
@@ -33,7 +33,11 @@ namespace Clinica.TdTablas
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            
+            if (!optionsBuilder.IsConfigured)
+            {
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
+                optionsBuilder.UseSqlServer("Server=LAPTOP-0D4OERM0;DataBase= dbapi; Integrated Security=true");
+            }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -83,20 +87,6 @@ namespace Clinica.TdTablas
                 entity.ToTable("Evaluation");
 
                 entity.Property(e => e.Id).HasColumnName("id");
-
-                entity.Property(e => e.IdPatients)
-                    .HasMaxLength(100)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.IdTherapy)
-                    .HasMaxLength(100)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.Price)
-                    .HasMaxLength(100)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.Visitas).HasColumnName("visitas");
             });
 
             modelBuilder.Entity<IdtherapistIdtherapy>(entity =>
@@ -266,7 +256,7 @@ namespace Clinica.TdTablas
             modelBuilder.Entity<Recurrencium>(entity =>
             {
                 entity.HasKey(e => e.IdRecurrencia)
-                    .HasName("PK__recurren__D2D9B8818CC4C38A");
+                    .HasName("PK__recurren__D2D9B8816906D261");
 
                 entity.ToTable("recurrencia");
 
@@ -283,7 +273,7 @@ namespace Clinica.TdTablas
                 entity.HasOne(d => d.IdEvaluationNavigation)
                     .WithMany(p => p.Recurrencia)
                     .HasForeignKey(d => d.IdEvaluation)
-                    .HasConstraintName("FK__recurrenc__IdEva__0D44F85C");
+                    .HasConstraintName("FK__recurrenc__IdEva__43A1090D");
             });
 
             modelBuilder.Entity<Rol>(entity =>

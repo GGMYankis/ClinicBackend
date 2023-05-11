@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Clinica.Modelos;
-using Clinica.TdTablas;
+using Clinica.SqlTblas;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Data;
@@ -203,7 +203,7 @@ namespace Clinica.Controllers
 
         [HttpPut]
         [Route("EditarAdmin")]
-        public IActionResult EditarAdmin([FromBody] TdTablas.User objeto)
+        public IActionResult EditarAdmin([FromBody] SqlTblas.User objeto)
         {
             User oProducto = _dbcontext.Users.Find(objeto.IdUser);
             if (oProducto == null)
@@ -420,6 +420,40 @@ namespace Clinica.Controllers
 
 
         [HttpPost]
+        [Route("BuscarPacientePorTerapeuta")]
+        public async Task<IActionResult> BuscarPacientePorTerapeuta(IdtherapistIdtherapy terapeutaId)
+        {
+            try
+            {
+                List<Probar> viewModal = new List<Probar>();
+                var evaluaciones = await _dbcontext.Evaluations.Where(e => e.IdTerapeuta == terapeutaId.Idterapeuta).ToListAsync();
+
+                if (evaluaciones != null)
+                {
+                    foreach (var cita in evaluaciones)
+                    {
+                        var idsTerapia = cita.IdPatients;
+                        var terapia = await Filtrar(idsTerapia);
+
+                        Probar nuevoObjeto = new Probar();
+                        nuevoObjeto.NombrePaciente = terapia;
+                        viewModal.Add(nuevoObjeto);
+                    }
+                }
+
+                return Ok(viewModal);
+            }
+            catch(Exception ex) {
+                return Ok(ex);
+            }
+              
+        }
+
+
+    
+
+
+        [HttpPost]
         [Route("Post")]
         public IActionResult Post(ListaEnteros obj)
         {
@@ -459,33 +493,72 @@ namespace Clinica.Controllers
 
             mensaje = "No hubo Inversión para esta fecha";
             return StatusCode(StatusCodes.Status200OK, new { mensaje = mensaje });
-
         }
-   
-       
+
+
+
+        [HttpPost]
+        [Route("GastosGanancia")]
+        public async Task<IActionResult> GastosGanancia(Attendance obj)
+        {
+
+            Attendance fechaInicio = new  Attendance();
+
+            List<Probar> viewModal = new List<Probar>();
+            var attendanceList = _dbcontext.Attendances.Where(x => x.FechaInicio >= obj.FechaInicio && x.FechaInicio < obj.FechaFinal).ToList();
+            foreach (var cita in attendanceList)
+            {
+                var idsTerapia = cita.IdTherapy;
+                var fechas = cita.FechaInicio;
+                var terapia = await FiltrarTerapia(idsTerapia);
+
+                fechaInicio.FechaInicio = fechas;   
+              
+                Probar nuevoObjeto = new Probar();
+                nuevoObjeto.FechaInicio = fechaInicio;
+
+                nuevoObjeto.NombreTerapia = terapia;
+
+                viewModal.Add(nuevoObjeto);
+            }
+            return StatusCode(StatusCodes.Status200OK, new { viewModal });
+        }
+
+
 
         [HttpPost]
         [Route("Buscar")]
         public async Task<IActionResult> Buscar(Attendance obj)
         {
-            List<Probar> viewModal = new List<Probar>();
-            var attendanceList = _dbcontext.Attendances.Where(x => x.IdTerapeuta == obj.IdTerapeuta && x.FechaInicio >= obj.FechaInicio && x.FechaInicio < obj.FechaFinal).ToList();
-            foreach (var cita in attendanceList)
+
+            try
             {
-                var ids = cita.IdPatients;
-                var idsTerapia = cita.IdTherapy;
-                var idTerapeuta = cita.IdTerapeuta;
-                var paciente = await Filtrar(ids);
-                var terapia = await FiltrarTerapia(idsTerapia);
-                var terapeuta = await FiltrarTerapeuta(idTerapeuta);
-                Probar nuevoObjeto = new Probar();
-                nuevoObjeto.NombrePaciente = paciente;
-                nuevoObjeto.NombreTerapia = terapia;
-                nuevoObjeto.NombreTerapeuta = terapeuta;
-                viewModal.Add(nuevoObjeto);
+                List<Probar> viewModal = new List<Probar>();
+                var attendanceList = _dbcontext.Attendances.Where(x => x.IdTerapeuta == obj.IdTerapeuta && x.FechaInicio >= obj.FechaInicio && x.FechaInicio < obj.FechaFinal).ToList();
+                foreach (var cita in attendanceList)
+                {
+                    var ids = cita.IdPatients;
+                    var idsTerapia = cita.IdTherapy;
+                    var idTerapeuta = cita.IdTerapeuta;
+                    var paciente = await Filtrar(ids);
+                    var terapia = await FiltrarTerapia(idsTerapia);
+                    var terapeuta = await FiltrarTerapeuta(idTerapeuta);
+                    Probar nuevoObjeto = new Probar();
+                    nuevoObjeto.NombrePaciente = paciente;
+                    nuevoObjeto.NombreTerapia = terapia;
+                    nuevoObjeto.NombreTerapeuta = terapeuta;
+                    viewModal.Add(nuevoObjeto);
+                }
+                return Ok(viewModal);
             }
-            return Ok(viewModal);
+            catch(Exception ex) {
+                return Ok("error");
+            }
+       
         }
+     
+
+
         private async Task<Patient> Filtrar(int? ids)
         {
             var paciente = await _dbcontext.Patients.FindAsync(ids);
@@ -570,12 +643,6 @@ namespace Clinica.Controllers
             {
                 return StatusCode(StatusCodes.Status200OK, new { mensaje = ex.Message });
             }
-
-
-
-            // filtrar gastos del mes
-
-
 
 
 

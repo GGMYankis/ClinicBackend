@@ -4,7 +4,7 @@
     <Controller_SelectedScaffolderID>ApiControllerEmptyScaffolder</Controller_SelectedScaffolderID>
     <Controller_SelectedScaffolderCategoryPath>root/Common/Api</Controller_SelectedScaffolderCategoryPath>
     <WebStackScaffolding_ControllerDialogWidth>650</WebStackScaffolding_ControllerDialogWidth>
-    <NameOfLastUsedPublishProfile>C:\Users\LENOVO\Documents\GitHub\ClinicBackend\Properties\PublishProfiles\yankisggm12ffs-001-site1 - Web Deploy.pubxml</NameOfLastUsedPublishProfile>
+    <NameOfLastUsedPublishProfile>C:\Users\LENOVO\Documents\GitHub\ClinicBackend\Properties\PublishProfiles\yankisggm-001-site1 - Web Deploy.pubxml</NameOfLastUsedPublishProfile>
     <ActiveDebugProfile>Clinica</ActiveDebugProfile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

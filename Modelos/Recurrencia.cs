@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Clinica.SqlTblas;
 
-namespace Clinica.TdTablas
+namespace Clinica.Modelos
 {
-    public partial class Recurrencium
+    public class Recurrencia
     {
         public int IdRecurrencia { get; set; }
         public DateTime? FechaInicio { get; set; }

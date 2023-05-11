@@ -11,7 +11,7 @@ using System.Runtime.Intrinsics.Arm;
 using Nest;
 using Microsoft.AspNetCore.Authorization;
 using System.Net.Http.Headers;
-using Clinica.TdTablas;
+using Clinica.SqlTblas;
 using Newtonsoft.Json.Linq;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
