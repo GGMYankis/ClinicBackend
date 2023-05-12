@@ -102,7 +102,6 @@ namespace Clinica.Controllers
         }
 
 
-
         [HttpGet("{id}")]
         public async Task<ActionResult<Evaluation>> ObtenerUsuario(int id)
         {
@@ -114,6 +113,10 @@ namespace Clinica.Controllers
             return resId;
         }
 
+
+
+
+        /*
 
         [HttpPost]
         [Route("GastosGanancia")]
@@ -160,7 +163,7 @@ namespace Clinica.Controllers
             return lista;
         }
 
-
+        */
 
     }
 }

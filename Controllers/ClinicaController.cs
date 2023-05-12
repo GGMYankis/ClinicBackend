@@ -8,12 +8,15 @@ using System.Data;
 using Microsoft.AspNetCore.Authorization;
 using Nest;
 using static Nest.JoinField;
-using System.Data.SqlClient;
 using System.Drawing;
 using System.Security.Cryptography.X509Certificates;
+using System.Globalization;
+using Microsoft.AspNetCore.Cors;
+using System.Data.SqlClient;
 
 namespace Clinica.Controllers
 {
+    [EnableCors("ReglasCors")]
     [Route("api/[controller]")]
     [ApiController]
     public class ClinicaController : ControllerBase
@@ -41,7 +44,6 @@ namespace Clinica.Controllers
                 return StatusCode(StatusCodes.Status200OK, new { mensaje = ex.Message, Lista });
             }
         }
-
 
         [HttpGet]
         [Route("Listas")]
@@ -91,8 +93,6 @@ namespace Clinica.Controllers
             }
         }
 
-
-
         [HttpPost]
         [Route("ContabilidadReportes")]
         public IActionResult ContabilidadReportes([FromBody] Inversion objeto)
@@ -108,8 +108,6 @@ namespace Clinica.Controllers
                 return StatusCode(StatusCodes.Status200OK, new { mensaje = ex.Message });
             }
         }
-
-
 
         [HttpPut]
         [Route("EditarPaciente")]
@@ -157,8 +155,6 @@ namespace Clinica.Controllers
                 return StatusCode(StatusCodes.Status200OK, new { mensaje = ex.Message });
             }
         }
-
-
 
         [HttpPost]
         [Route("CrearTerapia")]
@@ -224,7 +220,6 @@ namespace Clinica.Controllers
             }
         }
 
-
         [HttpPost]
         [Route("Asistencias")]
         public IActionResult Asistencias([FromBody] Attendance attendance)
@@ -281,11 +276,9 @@ namespace Clinica.Controllers
             return Ok();
         }
 
-
         //  <----------------------------- filtrar citas -------------------------> 
 
-
-          [HttpGet]
+        [HttpGet]
         [Route("Moscu")]
         public IActionResult Moscu()
         {
@@ -300,10 +293,6 @@ namespace Clinica.Controllers
                 return StatusCode(StatusCodes.Status200OK, new { mensaje = ex.Message, Lista });
             }
         }
-       
-
-
-
 
         [HttpPost]
         [Route("CrearUsuario")]
@@ -321,8 +310,6 @@ namespace Clinica.Controllers
             }
         }
 
-
-
         [HttpPost]
         [Route("EliminarUsuario")]
         public IActionResult EliminarUsuario([FromBody] User objeto)
@@ -339,9 +326,6 @@ namespace Clinica.Controllers
                 return StatusCode(StatusCodes.Status200OK, new { mensaje = ex.Message });
             }
         }
-
-
-
 
         [HttpPost]
         [Route("GuardarUsers")]
@@ -368,9 +352,6 @@ namespace Clinica.Controllers
 
         }
 
-
-
-
         [HttpGet]
         [Route("ListaTerapia")]
         public IActionResult ListaTerapia()
@@ -394,7 +375,6 @@ namespace Clinica.Controllers
             }
         }
 
-
         [HttpPost]
         [Route("GetEvaluacionByTerapeuta")]
         public async Task<IActionResult> GetEvaluacionByTerapeuta(IdtherapistIdtherapy terapeutaId)
@@ -417,7 +397,6 @@ namespace Clinica.Controllers
 
             return Ok(viewModal);
         }
-
 
         [HttpPost]
         [Route("BuscarPacientePorTerapeuta")]
@@ -443,16 +422,12 @@ namespace Clinica.Controllers
 
                 return Ok(viewModal);
             }
-            catch(Exception ex) {
+            catch (Exception ex)
+            {
                 return Ok(ex);
             }
-              
+
         }
-
-
-    
-
-
         [HttpPost]
         [Route("Post")]
         public IActionResult Post(ListaEnteros obj)
@@ -465,8 +440,6 @@ namespace Clinica.Controllers
             _dbcontext.SaveChanges();
             return Ok();
         }
-
-     
         [HttpPost]
         [Route("FiltrarGastos")]
         public async Task<IActionResult> FiltrarGastos(Inversion obj)
@@ -475,8 +448,7 @@ namespace Clinica.Controllers
             List<Inversion> viewModal = new List<Inversion>();
             var gastos = _dbcontext.Inversions.Where(x => x.DateOfInvestment >= obj.DateOfInvestment && x.DateOfInvestment < obj.EndDate).ToList();
 
-
-            if(gastos.Count != 0)
+            if (gastos.Count != 0)
             {
                 foreach (var cita in gastos)
                 {
@@ -488,13 +460,10 @@ namespace Clinica.Controllers
                     viewModal.Add(inversion);
                 }
                 return Ok(viewModal);
-              
             }
-
             mensaje = "No hubo Inversión para esta fecha";
             return StatusCode(StatusCodes.Status200OK, new { mensaje = mensaje });
         }
-
 
 
         [HttpPost]
@@ -502,7 +471,7 @@ namespace Clinica.Controllers
         public async Task<IActionResult> GastosGanancia(Attendance obj)
         {
 
-            Attendance fechaInicio = new  Attendance();
+            Attendance fechaInicio = new Attendance();
 
             List<Probar> viewModal = new List<Probar>();
             var attendanceList = _dbcontext.Attendances.Where(x => x.FechaInicio >= obj.FechaInicio && x.FechaInicio < obj.FechaFinal).ToList();
@@ -512,8 +481,8 @@ namespace Clinica.Controllers
                 var fechas = cita.FechaInicio;
                 var terapia = await FiltrarTerapia(idsTerapia);
 
-                fechaInicio.FechaInicio = fechas;   
-              
+                fechaInicio.FechaInicio = fechas;
+
                 Probar nuevoObjeto = new Probar();
                 nuevoObjeto.FechaInicio = fechaInicio;
 
@@ -523,8 +492,6 @@ namespace Clinica.Controllers
             }
             return StatusCode(StatusCodes.Status200OK, new { viewModal });
         }
-
-
 
         [HttpPost]
         [Route("Buscar")]
@@ -551,14 +518,12 @@ namespace Clinica.Controllers
                 }
                 return Ok(viewModal);
             }
-            catch(Exception ex) {
+            catch (Exception ex)
+            {
                 return Ok("error");
             }
-       
+
         }
-     
-
-
         private async Task<Patient> Filtrar(int? ids)
         {
             var paciente = await _dbcontext.Patients.FindAsync(ids);
@@ -643,12 +608,40 @@ namespace Clinica.Controllers
             {
                 return StatusCode(StatusCodes.Status200OK, new { mensaje = ex.Message });
             }
-
-
-
-
-
         }
+
+
+        [HttpPost]
+        [Route("Probar")]
+        public object Probar([FromBody] Buscar obj)
+        {
+            List<Buscar> lista = new List<Buscar>();
+
+            try
+            {
+                using (var dbContext = _dbcontext)
+                {
+                    var result = from a in dbContext.Attendances
+                                 join t in dbContext.Therapies on a.IdTherapy equals t.IdTherapy
+                                 where a.FechaInicio >= obj.FechaInicio && a.FechaInicio <= obj.FechaFinal
+                                 select new Buscar
+                                 {
+                                     Price = t.Price,
+                                     Label = t.Label,
+                                     FechaInicio = a.FechaInicio,
+                                     FechaFinal = a.FechaFinal
+                                 };
+
+                    lista = result.ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                lista = new List<Buscar>();
+            }
+            return lista;
+        }
+
     }
 }
 

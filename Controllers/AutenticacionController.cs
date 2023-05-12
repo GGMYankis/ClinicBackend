@@ -15,6 +15,8 @@ using Clinica.SqlTblas;
 using Newtonsoft.Json.Linq;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
+using Clinica.Modelos;
+using System.Globalization;
 
 namespace Clinica.Controllers
 {
@@ -74,6 +76,57 @@ namespace Clinica.Controllers
                 string tokencreado = tokenHandler.WriteToken(tokenConfig);
                 return StatusCode(StatusCodes.Status200OK, new { tokencreado, user });      
         }
+
+        [HttpPost]
+        [Route("GastosGanancia")]
+        public List<Buscar> GastosGanancia([FromBody] Buscar obj)
+        {
+            List<Buscar> lista = new List<Buscar>();
+            try
+            {
+                using (var conexion = new SqlConnection(cadenaSQL))
+                {
+
+                    SqlCommand cmd = new SqlCommand("sp_buscar", conexion);
+                    cmd.Parameters.AddWithValue("@fechainicio", obj.FechaInicio);
+                    cmd.Parameters.AddWithValue("@FechaFinal", obj.FechaFinal);
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    conexion.Open();
+                    cmd.ExecuteNonQuery();
+
+                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    {
+                        while (dr.Read())
+                        {
+                            lista.Add(
+                                new Buscar()
+                                {
+
+                                    Price = Convert.ToInt32(dr["Price"], new CultureInfo("es-PE")),
+                                    Label = dr["Label"].ToString(),
+                                    FechaInicio = Convert.ToDateTime(dr["FechaInicio"])
+
+                                }
+                                );
+                        }
+                    }
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+                lista = new List<Buscar>();
+            }
+            return lista;
+        }
+
+
+
+
+ 
+
     }
 }
 
