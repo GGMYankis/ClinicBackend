@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Clinica.Modelos;
-using Clinica.SqlTblas;
+using Clinica.NewModels;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Data;
@@ -37,7 +37,7 @@ namespace Clinica.Controllers
             try
             {
                 Lista = _dbcontext.Patients.ToList();
-                return StatusCode(StatusCodes.Status200OK, new { mensaje = "ok", Lista });
+                return Ok(Lista);
             }
             catch (Exception ex)
             {
@@ -199,7 +199,7 @@ namespace Clinica.Controllers
 
         [HttpPut]
         [Route("EditarAdmin")]
-        public IActionResult EditarAdmin([FromBody] SqlTblas.User objeto)
+        public IActionResult EditarAdmin([FromBody] NewModels.User objeto)
         {
             User oProducto = _dbcontext.Users.Find(objeto.IdUser);
             if (oProducto == null)
@@ -611,6 +611,8 @@ namespace Clinica.Controllers
         }
 
 
+
+
         [HttpPost]
         [Route("Probar")]
         public object Probar([FromBody] Buscar obj)
@@ -640,6 +642,75 @@ namespace Clinica.Controllers
                 lista = new List<Buscar>();
             }
             return lista;
+        }
+
+
+        [HttpPost]
+        [Route("AbonoTerapias")]
+        public IActionResult AbonoTerapias([FromBody] AbonosTerapia objeto)
+        {
+            try
+            {
+                _dbcontext.AbonosTerapias.Add(objeto);
+                _dbcontext.SaveChanges();
+                return StatusCode(StatusCodes.Status200OK, new { mensaje = "ok" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status200OK, new { mensaje = ex.Message });
+            }
+        }
+
+
+        [Route("ListaEvaluacion")]
+        public object ListaEvaluacion([FromBody] Buscar obj)
+        {
+             List<Buscar> lista = new List<Buscar>();
+             List<UserEvaluacion> olista = new List<UserEvaluacion>();
+
+            try
+            {
+                using (var dbContext = _dbcontext)
+                {
+                    var result = from r in dbContext.Recurrencia
+                                 where r.FechaInicio >= obj.FechaInicio && r.FechaInicio <= obj.FechaFinal
+                                 select new Buscar
+                                 {
+                                     FechaInicio = r.FechaInicio,
+                                     IdEvaluation = r.IdEvaluation
+                                 };
+
+                    lista = result.ToList();
+
+                    foreach (var listado in lista)
+                    {
+                        var idEva = listado.IdEvaluation;
+
+
+                        var resultEva = from e in dbContext.Evaluations
+                                        join t in dbContext.Therapies on e.IdTherapy equals t.IdTherapy
+                                        join u in dbContext.Users on e.IdTerapeuta equals u.IdUser
+                                        where e.Id == idEva
+                                        select new Modelos.UserEvaluacion
+                                        {
+                                            Terapeuta = u.Names,
+                                            Terapia = t.Label,
+                                            FechaInicio = listado.FechaInicio
+
+                                        };
+
+                        olista.AddRange(resultEva.ToList());
+                    }
+
+
+                   
+                }
+            }
+            catch (Exception ex)
+            {
+                lista = new List<Buscar>();
+            }
+            return olista;
         }
 
     }

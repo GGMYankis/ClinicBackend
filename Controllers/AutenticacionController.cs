@@ -11,7 +11,7 @@ using System.Runtime.Intrinsics.Arm;
 using Nest;
 using Microsoft.AspNetCore.Authorization;
 using System.Net.Http.Headers;
-using Clinica.SqlTblas;
+using Clinica.NewModels;
 using Newtonsoft.Json.Linq;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
@@ -43,7 +43,7 @@ namespace Clinica.Controllers
             {
                 var email = User.Claims.ElementAt(1).Value;
                 var user = _dbcontext.Users.FirstOrDefault(u => u.Email == email);
-                return Ok(user);
+                return StatusCode(StatusCodes.Status200OK, new {  user }); ;
             }
             catch (Exception)
             {

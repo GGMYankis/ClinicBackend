@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Clinica.SqlTblas
+namespace Clinica.NewModels
 {
     public partial class Attendance
     {
@@ -11,6 +11,7 @@ namespace Clinica.SqlTblas
         public int? IdTherapy { get; set; }
         public DateTime? FechaInicio { get; set; }
         public DateTime? FechaFinal { get; set; }
+        public string? TipoAsistencias { get; set; }
         public string? Remarks { get; set; }
     }
 }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace Clinica.SqlTblas
+namespace Clinica.NewModels
 {
     public partial class dbapiContext : DbContext
     {
@@ -17,6 +17,7 @@ namespace Clinica.SqlTblas
         }
 
         public virtual DbSet<Abono> Abonos { get; set; } = null!;
+        public virtual DbSet<AbonosTerapia> AbonosTerapias { get; set; } = null!;
         public virtual DbSet<Attendance> Attendances { get; set; } = null!;
         public virtual DbSet<Evaluation> Evaluations { get; set; } = null!;
         public virtual DbSet<IdtherapistIdtherapy> IdtherapistIdtherapies { get; set; } = null!;
@@ -33,11 +34,7 @@ namespace Clinica.SqlTblas
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            if (!optionsBuilder.IsConfigured)
-            {
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("Server=LAPTOP-0D4OERM0;DataBase= dbapi; Integrated Security=true");
-            }
+           
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -63,10 +60,17 @@ namespace Clinica.SqlTblas
                 entity.Property(e => e.Monto).HasColumnType("decimal(10, 2)");
             });
 
+            modelBuilder.Entity<AbonosTerapia>(entity =>
+            {
+                entity.Property(e => e.Fecha).HasColumnType("datetime");
+
+                entity.Property(e => e.MontoPagado).HasColumnType("decimal(18, 0)");
+            });
+
             modelBuilder.Entity<Attendance>(entity =>
             {
                 entity.HasKey(e => e.IdAsistencias)
-                    .HasName("PK__Attendan__E2B8D1AC720A3327");
+                    .HasName("PK__Attendan__E2B8D1AC97F11714");
 
                 entity.ToTable("Attendance");
 
@@ -80,6 +84,10 @@ namespace Clinica.SqlTblas
                     .HasMaxLength(100)
                     .IsUnicode(false)
                     .HasColumnName("remarks");
+
+                entity.Property(e => e.TipoAsistencias)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<Evaluation>(entity =>
@@ -294,7 +302,7 @@ namespace Clinica.SqlTblas
             modelBuilder.Entity<Therapy>(entity =>
             {
                 entity.HasKey(e => e.IdTherapy)
-                    .HasName("PK__therapy__87DD5B7C71673943");
+                    .HasName("PK__therapy__87DD5B7C0AC607B2");
 
                 entity.ToTable("therapy");
 

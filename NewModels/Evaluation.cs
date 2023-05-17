@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Clinica.SqlTblas
+namespace Clinica.NewModels
 {
     public partial class Evaluation
     {
@@ -10,7 +10,7 @@ namespace Clinica.SqlTblas
             Recurrencia = new HashSet<Recurrencium>();
         }
 
-        public int? Id { get; set; }
+        public int Id { get; set; }
         public int? IdPatients { get; set; }
         public int? IdTherapy { get; set; }
         public int? Price { get; set; }

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Clinica.SqlTblas
+namespace Clinica.NewModels
 {
     public partial class Patient
     {

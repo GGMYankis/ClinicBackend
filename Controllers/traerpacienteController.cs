@@ -1,5 +1,5 @@
 ﻿using Clinica.Modelos;
-using Clinica.SqlTblas;
+using Clinica.NewModels;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
