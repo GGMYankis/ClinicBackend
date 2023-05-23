@@ -18,23 +18,16 @@ builder.Services.AddCors(options =>
                           builder.AllowAnyOrigin()
                           .AllowAnyHeader()
                           .AllowAnyMethod();
-
-
                       });
 });
 
 
-
 // Add services to the container.
-
-
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
- 
 
 builder.Configuration.AddJsonFile("appsettings.json");
 var secretKey = builder.Configuration.GetSection("settings").GetSection("secretKey").ToString();// "=Codig0Estudiant3=";
@@ -58,10 +51,6 @@ builder.Services.AddAuthentication(config =>
         ValidateAudience = false
     };
 });
-
-
-
-
 
 
 var app = builder.Build();
