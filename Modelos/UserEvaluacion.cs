@@ -1,10 +1,24 @@
-﻿namespace Clinica.Modelos
+﻿using Clinica.SqlTables;
+
+namespace Clinica.Modelos
 {
     public class UserEvaluacion
     {
 
-        public string? Terapeuta { get; set; }
-        public string? Terapia { get; set; }
+        public User? Terapeuta { get; set; }
+        public Patient? Paciente { get; set; }
+        public Therapy? Terapia { get; set; }
+        public int? IdEvaluacion { get; set; }
+        public Consultorio? Consultorio { get; set; }
+        public int? Price { get; set; }
+        public int? IdConsultorio { get; set; }
+        
         public DateTime? FechaInicio { get; set; }
+        public int? Repetir { get; set; }
+        public string? Frecuencia { get; set; }
+        public string? Dias { get; set; }
+        public Recurrencium? Recurrencia { get; set; }
+
+        
     }
 }

@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="NewModels\" />
+    <Folder Include="SqlTables\" />
   </ItemGroup>
 
 </Project>

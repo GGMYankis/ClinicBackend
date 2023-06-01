@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Clinica.Modelos;
-using Clinica.NewModels;
+using Clinica.SqlTables;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Data;
@@ -36,7 +36,7 @@ namespace Clinica.Controllers
             List<Patient> Lista = new List<Patient>();
             try
             {
-                Lista = _dbcontext.Patients.ToList();
+                Lista = _dbcontext.Patients.Where(p => p.Activo == true).ToList();
                 return Ok(Lista);
             }
             catch (Exception ex)
@@ -45,6 +45,21 @@ namespace Clinica.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("ListaTodos")]
+        public IActionResult ListaTodos()
+        {
+            List<Patient> Lista = new List<Patient>();
+            try
+            {
+                Lista = _dbcontext.Patients.ToList();
+                return Ok(Lista);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status200OK, new { mensaje = ex.Message, Lista });
+            }
+        }
         [HttpGet]
         [Route("Listas")]
         public IActionResult Listas()
@@ -199,7 +214,7 @@ namespace Clinica.Controllers
 
         [HttpPut]
         [Route("EditarAdmin")]
-        public IActionResult EditarAdmin([FromBody] NewModels.User objeto)
+        public IActionResult EditarAdmin([FromBody] SqlTables.User objeto)
         {
             User oProducto = _dbcontext.Users.Find(objeto.IdUser);
             if (oProducto == null)
@@ -244,6 +259,24 @@ namespace Clinica.Controllers
             {
                 return StatusCode(StatusCodes.Status200OK, new { mensaje = ex.Message, Lista });
             }
+        }
+
+
+        [HttpGet]
+        [Route("Consultorios")]
+        public IActionResult Consultorios()
+        {
+            List<SqlTables.Consultorio> Lista = new List<SqlTables.Consultorio>();
+            try
+            {
+                Lista = _dbcontext.Consultorios.ToList();
+                return StatusCode(StatusCodes.Status200OK, new { mensaje = "ok", Lista });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status200OK, new { mensaje = ex.Message, Lista });
+            }
+        
         }
 
         [HttpGet]
@@ -311,12 +344,46 @@ namespace Clinica.Controllers
         }
 
         [HttpPost]
+        [Route("CrearConsultorio")]
+        public IActionResult CrearConsultorio([FromBody] SqlTables.Consultorio objeto)
+        {
+            try
+            {
+                _dbcontext.Consultorios.Add(objeto);
+                _dbcontext.SaveChanges();
+                return StatusCode(StatusCodes.Status200OK, new { mensaje = "ok" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status200OK, new { mensaje = ex.Message });
+            }
+        }
+
+        [HttpPost]
         [Route("EliminarUsuario")]
         public IActionResult EliminarUsuario([FromBody] User objeto)
         {
             try
             {
                 var usuarioEncontrado = _dbcontext.Users.FirstOrDefault(u => u.IdUser == objeto.IdUser);
+                _dbcontext.Remove(usuarioEncontrado);
+                _dbcontext.SaveChanges();
+                return StatusCode(StatusCodes.Status200OK, new { mensaje = "ok" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status200OK, new { mensaje = ex.Message });
+            }
+        }
+
+
+        [HttpPost]
+        [Route("EliminarConsultorio")]
+        public IActionResult EliminarConsultorio([FromBody] SqlTables.Consultorio objeto)
+        {
+            try
+            {
+                var usuarioEncontrado = _dbcontext.Consultorios.FirstOrDefault(u => u.IdConsultorio == objeto.IdConsultorio);
                 _dbcontext.Remove(usuarioEncontrado);
                 _dbcontext.SaveChanges();
                 return StatusCode(StatusCodes.Status200OK, new { mensaje = "ok" });
@@ -351,6 +418,28 @@ namespace Clinica.Controllers
             return Ok();
 
         }
+
+        [HttpPost]
+        [Route("EditarConsultorio")]
+        public IActionResult EditarConsultorio([FromBody] SqlTables.Consultorio objeto)
+        {
+
+            SqlTables.Consultorio oProducto = _dbcontext.Consultorios.Find(objeto.IdConsultorio);
+
+            if (oProducto == null)
+            {
+                return BadRequest("producto no encontrado");
+            }
+            oProducto.Nombre = objeto.Nombre is null ? oProducto.Nombre : objeto.Nombre;
+            oProducto.Descripcion = objeto.Descripcion is null ? oProducto.Descripcion : objeto.Descripcion;
+          
+
+            _dbcontext.Consultorios.Update(oProducto);
+            _dbcontext.SaveChanges();
+            return Ok();
+
+        }
+
 
         [HttpGet]
         [Route("ListaTerapia")]
@@ -405,22 +494,24 @@ namespace Clinica.Controllers
             try
             {
                 List<Probar> viewModal = new List<Probar>();
-                var evaluaciones = await _dbcontext.Evaluations.Where(e => e.IdTerapeuta == terapeutaId.Idterapeuta).ToListAsync();
+                var evaluaciones = await _dbcontext.Evaluations
+                .Where(e => e.IdTerapeuta == terapeutaId.Idterapeuta)
+                .Select(e => e.IdPatients) 
+                .Distinct()
+                .ToListAsync();
 
-                if (evaluaciones != null)
-                {
-                    foreach (var cita in evaluaciones)
-                    {
-                        var idsTerapia = cita.IdPatients;
-                        var terapia = await Filtrar(idsTerapia);
+                            if (evaluaciones != null)
+                            {
+                               foreach (var cita in evaluaciones)
+                               {
+                                       var resPaciente = await Filtrar(cita);
+                                      Probar nuevoObjeto = new Probar();
+                                      nuevoObjeto.NombrePaciente = resPaciente;
+                                     viewModal.Add(nuevoObjeto);
+                               }
+                            }
 
-                        Probar nuevoObjeto = new Probar();
-                        nuevoObjeto.NombrePaciente = terapia;
-                        viewModal.Add(nuevoObjeto);
-                    }
-                }
-
-                return Ok(viewModal);
+                    return Ok(viewModal);
             }
             catch (Exception ex)
             {
@@ -428,6 +519,8 @@ namespace Clinica.Controllers
             }
 
         }
+
+   
         [HttpPost]
         [Route("Post")]
         public IActionResult Post(ListaEnteros obj)
@@ -464,6 +557,24 @@ namespace Clinica.Controllers
             mensaje = "No hubo Inversión para esta fecha";
             return StatusCode(StatusCodes.Status200OK, new { mensaje = mensaje });
         }
+
+
+
+        //aquiiiii ------------------>\
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
 
 
         [HttpPost]
@@ -594,6 +705,8 @@ namespace Clinica.Controllers
         }
 
 
+
+
         [HttpPost]
         [Route("CrearAbono")]
         public IActionResult CrearAbono([FromBody] Abono objeto)
@@ -662,6 +775,285 @@ namespace Clinica.Controllers
         }
 
 
+
+
+        [HttpPost]
+        [Route("EliminarCita")]
+        public IActionResult EliminarCita([FromBody] Buscar obj)
+        {
+
+            var resRecu = _dbcontext.Recurrencia.FirstOrDefault(u => u.IdEvaluation == obj.IdEvaluation);
+
+            if (resRecu == null)
+            {
+                NoContent();
+            }
+            _dbcontext.Remove(resRecu);
+            _dbcontext.SaveChanges();
+
+            var resEva = _dbcontext.Evaluations.FirstOrDefault(u => u.Id == obj.IdEvaluation);
+
+            if (resEva == null)
+            {
+                NoContent();
+            }
+            _dbcontext.Remove(resEva);
+            _dbcontext.SaveChanges();
+
+         
+
+
+            return Ok();
+        }
+
+        [HttpPost]
+        [Route("EditarCitas")]
+        public IActionResult EditarCitas([FromBody] Evaluation objeto )
+        {
+
+            Evaluation oProducto = _dbcontext.Evaluations.Find(objeto.Id);
+
+            if (oProducto == null)
+            {
+                return BadRequest("producto no encontrado");
+            }
+
+            oProducto.IdPatients = objeto.IdPatients is null ? oProducto.IdPatients : objeto.IdPatients;
+            oProducto.IdTherapy = objeto.IdTherapy is null ? oProducto.IdTherapy : objeto.IdTherapy;
+            oProducto.Price = objeto.Price is null ? oProducto.Price : objeto.Price;
+            oProducto.IdTerapeuta = objeto.IdTerapeuta is null ? oProducto.IdTerapeuta : objeto.IdTerapeuta;
+            oProducto.Visitas = objeto.Visitas is null ? oProducto.Visitas : objeto.Visitas;
+            oProducto.IdConsultorio = objeto.IdConsultorio is null ? oProducto.IdConsultorio : objeto.IdConsultorio;
+
+            _dbcontext.Evaluations.Update(oProducto);
+            _dbcontext.SaveChanges();
+
+            return Ok(objeto.Id);
+
+        }
+
+        [HttpPost]
+        [Route("EditarRecurrencia")]
+        public IActionResult EditarRecurrencia([FromBody] Recurrencium objeto)
+        {
+
+            Recurrencium oProducto = _dbcontext.Recurrencia.Find(objeto.IdRecurrencia);
+
+            if (oProducto == null)
+            {
+                return BadRequest("producto no encontrado");
+            }
+
+            oProducto.FechaInicio = objeto.FechaInicio is null ? oProducto.FechaInicio : objeto.FechaInicio;
+            oProducto.Repetir = objeto.Repetir is null ? oProducto.Repetir : objeto.Repetir;
+            oProducto.Frecuencia = objeto.Frecuencia is null ? oProducto.Frecuencia : objeto.Frecuencia;
+            oProducto.Dias = objeto.Dias is null ? oProducto.Dias : objeto.Dias;
+            oProducto.IdEvaluation = objeto.IdEvaluation is null ? oProducto.IdEvaluation : objeto.IdEvaluation;
+
+            _dbcontext.Recurrencia.Update(oProducto);
+            _dbcontext.SaveChanges();
+
+            return Ok();
+
+        }
+
+
+
+
+        [HttpGet]
+        [Route("Citas")]
+        public object Citas()
+        {
+            string mensaje = string.Empty;
+            List<Evaluation> viewModal = new List<Evaluation>();
+            List<UserEvaluacion> olista = new List<UserEvaluacion>();
+            List<Buscar> recu = new List<Buscar>();
+
+
+            using (var dbContext = _dbcontext)
+            {
+                var result = from r in dbContext.Recurrencia
+                             select new Buscar
+                             {
+                                 FechaInicio = r.FechaInicio,
+                                 Repetir = r.Repetir,
+                                 Frecuencia = r.Frecuencia,
+                                 Dias = r.Dias,
+                                 IdEvaluation = r.IdEvaluation,
+                                 IdRecurrencia = r.IdRecurrencia
+                             };
+
+                recu = result.ToList();
+
+                foreach (var listado in recu)
+                {
+                    var idEva = listado.IdEvaluation;
+
+
+                    var resultEva = from e in dbContext.Evaluations
+                                    join c in dbContext.Consultorios on e.IdConsultorio equals c.IdConsultorio
+                                    join t in dbContext.Therapies on e.IdTherapy equals t.IdTherapy
+                                    join p in dbContext.Patients on e.IdPatients equals p.IdPatients
+                                    join u in dbContext.Users on e.IdTerapeuta equals u.IdUser
+                                    where e.Id == idEva && p.Activo == true
+                                    select new Modelos.UserEvaluacion
+                                    {
+                                        IdEvaluacion = idEva,
+                                        Terapeuta = new User
+                                        {
+                                            IdUser = u.IdUser,
+                                            Names = u.Names
+                                        },
+                                        Terapia = new Therapy
+                                        {
+                                            IdTherapy = t.IdTherapy,
+                                            Label = t.Label
+                                        },
+
+                                        Paciente = new Patient
+                                        {   IdPatients = p.IdPatients,
+                                            Name = p.Name,
+                                            Activo = p.Activo
+                                        },
+                                        FechaInicio = listado.FechaInicio,
+                                        Price = e.Price,
+
+                                        Consultorio = new Modelos.Consultorio
+                                        {
+                                            IdConsultorio = c.IdConsultorio,
+                                            Nombre = c.Nombre,
+                                            
+                                        },
+
+                                        Repetir = listado.Repetir,
+                                        Frecuencia = listado.Frecuencia,
+                                        Dias = listado.Dias,
+
+                                        Recurrencia = new SqlTables.Recurrencium
+                                        {
+                                            IdRecurrencia = (int)listado.IdRecurrencia
+                                        }
+                                    };
+
+                    olista.AddRange(resultEva.Distinct().ToList());
+                }
+
+            }
+
+
+            return olista;
+        }
+
+
+        [HttpPost]
+        [Route("FiltrarConsultorios")]
+        public object FiltrarConsultorios(Buscar obj)
+        {
+            string mensaje = string.Empty;
+            List<Evaluation> viewModal = new List<Evaluation>();
+            List<UserEvaluacion> olista = new List<UserEvaluacion>();
+            List<Buscar> recu = new List<Buscar>();
+
+
+            using (var dbContext = _dbcontext)
+            {
+                var result = from r in dbContext.Recurrencia
+                             where r.FechaInicio >= obj.FechaInicio && r.FechaInicio <= obj.FechaFinal
+                             select new Buscar
+                             {
+                                 FechaInicio = r.FechaInicio,
+                                 IdEvaluation = r.IdEvaluation
+                             };
+
+                recu = result.ToList();
+
+                if(obj.IdConsultorio == 0)
+                {
+                    foreach (var listado in recu)
+                    {
+                        var idEva = listado.IdEvaluation;
+
+
+                        var resultEva = from e in dbContext.Evaluations
+                                        join c in dbContext.Consultorios on e.IdConsultorio equals c.IdConsultorio
+                                        join t in dbContext.Therapies on e.IdTherapy equals t.IdTherapy
+                                        join p in dbContext.Patients on e.IdPatients equals p.IdPatients
+                                        join u in dbContext.Users on e.IdTerapeuta equals u.IdUser
+                                        where e.Id == idEva  && p.Activo == true
+                                        select new Modelos.UserEvaluacion
+                                        {
+                                            IdEvaluacion = idEva,
+
+                                            Terapeuta = new User
+                                            {
+                                                Names = u.Names
+                                            },
+                                            Terapia = new Therapy
+                                            {
+                                                Label = t.Label
+                                            },
+
+                                            Paciente = new Patient
+                                            {
+                                                Name = p.Name
+                                            },
+                                            FechaInicio = listado.FechaInicio,
+
+                                            Consultorio = new Modelos.Consultorio
+                                            {
+                                                Nombre = c.Nombre
+                                            },
+                                        };
+
+                        olista.AddRange(resultEva.ToList());
+                    }
+                    return olista;
+                }
+
+                foreach (var listado in recu)
+                {
+                    var idEva = listado.IdEvaluation;
+
+
+                    var resultEva = from e in dbContext.Evaluations
+                                    join c in dbContext.Consultorios on e.IdConsultorio equals c.IdConsultorio
+                                    join t in dbContext.Therapies on e.IdTherapy equals t.IdTherapy
+                                    join p in dbContext.Patients on e.IdPatients equals p.IdPatients
+                                    join u in dbContext.Users on e.IdTerapeuta equals u.IdUser
+                                    where e.Id == idEva && e.IdConsultorio == obj.IdConsultorio && p.Activo == true
+                                    select new Modelos.UserEvaluacion
+                                    {
+                                        IdEvaluacion = idEva,
+
+                                        Terapeuta = new User
+                                        {
+                                            Names = u.Names
+                                        },
+                                        Terapia = new Therapy
+                                        {
+                                            Label = t.Label
+                                        },
+                                      
+                                        Paciente = new Patient
+                                        {
+                                            Name = p.Name
+                                        },
+                                        FechaInicio = listado.FechaInicio,
+
+                                           Consultorio = new Modelos.Consultorio
+                                           {
+                                               Nombre = c.Nombre
+                                           },
+                                    };
+
+                    olista.AddRange(resultEva.ToList());
+                }
+
+            }
+
+            return olista;
+        }
+
         [Route("ListaEvaluacion")]
         public object ListaEvaluacion([FromBody] Buscar obj)
         {
@@ -693,8 +1085,15 @@ namespace Clinica.Controllers
                                         where e.Id == idEva
                                         select new Modelos.UserEvaluacion
                                         {
-                                            Terapeuta = u.Names,
-                                            Terapia = t.Label,
+
+                                            Terapeuta = new User
+                                            {
+                                                Names = u.Names
+                                            },
+                                            Terapia = new Therapy
+                                            {
+                                                Label = t.Label
+                                            },
                                             FechaInicio = listado.FechaInicio
 
                                         };

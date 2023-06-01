@@ -1,4 +1,4 @@
-﻿using Clinica.NewModels;
+﻿using Clinica.SqlTables;
 
 namespace Clinica.Modelos
 {
@@ -11,4 +11,7 @@ namespace Clinica.Modelos
         public Attendance FechaInicio { get; set; }
 
     }
+
+
+ 
 }
