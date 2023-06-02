@@ -9,6 +9,7 @@
         public DateTime? FechaFinal { get; set; }
         public int? IdConsultorio { get; set; }
         public int? IdEvaluation { get; set; }
+        public int? IdTerapeuta { get; set; }
         public int? IdRecurrencia { get; set; }
         public int? Repetir { get; set; }
         public string? Frecuencia { get; set; }

@@ -13,6 +13,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Globalization;
 using Microsoft.AspNetCore.Cors;
 using System.Data.SqlClient;
+using System.Linq;
 
 namespace Clinica.Controllers
 {
@@ -562,20 +563,7 @@ namespace Clinica.Controllers
 
         //aquiiiii ------------------>\
 
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
+       
 
         [HttpPost]
         [Route("GastosGanancia")]
@@ -1059,7 +1047,7 @@ namespace Clinica.Controllers
         {
              List<Buscar> lista = new List<Buscar>();
              List<UserEvaluacion> olista = new List<UserEvaluacion>();
-
+            List<UserEvaluacion> Terapeutas = new List<UserEvaluacion>();
             try
             {
                 using (var dbContext = _dbcontext)
@@ -1082,27 +1070,111 @@ namespace Clinica.Controllers
                         var resultEva = from e in dbContext.Evaluations
                                         join t in dbContext.Therapies on e.IdTherapy equals t.IdTherapy
                                         join u in dbContext.Users on e.IdTerapeuta equals u.IdUser
-                                        where e.Id == idEva
+                                        where e.Id == idEva && e.IdTerapeuta == obj.IdTerapeuta
                                         select new Modelos.UserEvaluacion
                                         {
 
                                             Terapeuta = new User
-                                            {
+                                            {   IdUser = u.IdUser,
                                                 Names = u.Names
                                             },
                                             Terapia = new Therapy
                                             {
-                                                Label = t.Label
+                                                Label = t.Label,
+                                                Price = t.Price
                                             },
-                                            FechaInicio = listado.FechaInicio
-
+                                            FechaInicio = listado.FechaInicio           
                                         };
 
-                        olista.AddRange(resultEva.ToList());
+                        olista.AddRange(resultEva.ToList());                 
+                    }
+
+                    foreach (var item in olista)
+                    {
+                        int idTerapeuta = item.Terapeuta.IdUser;
+
+                        bool existeTerapeuta = Terapeutas.Any(item => item.Terapeuta.IdUser == idTerapeuta);
+                        if (existeTerapeuta)
+                        {
+                            Modelos.UserEvaluacion tera = Terapeutas.FirstOrDefault(u => u.Terapeuta.IdUser == idTerapeuta);
+                        }
+                        else
+                        {
+                           
+                        }
+
+                    }
+
+                }
+            }
+            catch (Exception ex)
+            {
+                lista = new List<Buscar>();
+            }
+            return olista;
+        }
+
+
+        [Route("ListaEvaluacions")]
+        public object ListaEvaluacions([FromBody] Buscar obj)
+        {
+            List<Buscar> lista = new List<Buscar>();
+            List<UserEvaluacion> olista = new List<UserEvaluacion>();
+            try
+            {
+                using (var dbContext = _dbcontext)
+                {
+                    var result = from r in dbContext.Recurrencia
+                                 where r.FechaInicio >= obj.FechaInicio && r.FechaInicio <= obj.FechaFinal
+                                 select new Buscar
+                                 {
+                                     FechaInicio = r.FechaInicio,
+                                     IdEvaluation = r.IdEvaluation
+                                 };
+
+                    lista = result.ToList();
+
+                    foreach (var listado in lista)
+                    {
+                        var idEva = listado.IdEvaluation;
+
+
+                        var resultEva = from e in dbContext.Evaluations
+                                        join a in dbContext.Attendances on new { e.IdPatients, e.IdTerapeuta,e.IdTherapy} equals new { a.IdPatients,a.IdTerapeuta ,a.IdTherapy }
+                                        where e.Id == idEva
+                                        select new
+                                        {
+                                            Evaluation = e,
+                                            Attendance = a
+                                        };
+
+
+                        foreach (var todos in resultEva)
+                        {
+                        }
+
+                        var resultPatients = from r in resultEva
+                                             join p in dbContext.Patients on r.Attendance.IdPatients equals p.IdPatients
+                                           join t in dbContext.Therapies on r.Attendance.IdTherapy equals t.IdTherapy
+                                           join u in dbContext.Users on r.Attendance.IdTerapeuta equals u.IdUser
+                                             select new Modelos.UserEvaluacion
+                                             {
+                                               
+                                                 Paciente = p,
+                                                 Terapia = t,
+                                                 Terapeuta = u,
+                                                 FechaInicio = r.Attendance.FechaInicio,
+                                                 Price = r.Evaluation.Price
+                                             };
+
+                    
+
+
+                        olista.AddRange(resultPatients.ToList());
                     }
 
 
-                   
+
                 }
             }
             catch (Exception ex)
