@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Nest;
+using System;
 using System.Data;
 using System.Data.SqlClient;
 using System.Globalization;
@@ -45,18 +46,66 @@ namespace Clinica.Controllers
             {
                 return StatusCode(StatusCodes.Status200OK, new { mensaje = ex.Message });
             }
-       
-         }
+         
+        }
 
 
         [HttpPost]
         [Route("CrearRecurrencia")]
-        public IActionResult CrearRecurrencia([FromBody] Recurrencium recurrencia)
+        public IActionResult CrearRecurrencia([FromBody] Recurrencia obj)
         {
+           
             try
             {
-                _dbcontext.Recurrencia.Add(recurrencia);
-                _dbcontext.SaveChanges();
+
+                if(obj.IdRecurrencia > 0)
+                {
+                    var id = obj.IdRecurrencia;
+
+                    var oProducto = _dbcontext.Recurrencia.Where(r => r.IdEvaluation == obj.IdEvaluation).ToList();
+                    foreach (var numero in oProducto)
+                    {
+                         _dbcontext.Recurrencia.Remove(numero);
+                        _dbcontext.SaveChanges();
+
+                    }
+
+
+               
+                    foreach (var numero in obj.DiasA)
+                    {
+                        Recurrencium recu = new Recurrencium();
+                        recu.Dias = numero;
+                        recu.FechaInicio = obj.FechaInicio;
+                        recu.Repetir = obj.Repetir;
+                        recu.IdEvaluation = obj.IdEvaluation;
+                        recu.Frecuencia = obj.Frecuencia;
+
+                        _dbcontext.Recurrencia.Add(recu);
+                        _dbcontext.SaveChanges();
+                    }
+
+
+                    return Ok();
+                }
+
+              
+
+                foreach (var numero in obj.DiasA)
+                {
+                    Recurrencium recu = new Recurrencium();
+                    recu.Dias = numero;
+                    recu.FechaInicio = obj.FechaInicio;
+                    recu.Repetir = obj.Repetir;
+                    recu.IdEvaluation = obj.IdEvaluation;
+                    recu.Frecuencia = obj.Frecuencia;
+
+                    _dbcontext.Recurrencia.Add(recu);
+                    _dbcontext.SaveChanges();
+                }
+              
+
+              
                 return Ok();
             }
             catch (Exception ex)

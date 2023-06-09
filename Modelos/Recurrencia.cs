@@ -9,6 +9,7 @@ namespace Clinica.Modelos
         public int? Repetir { get; set; }
         public string? Frecuencia { get; set; }
         public string? Dias { get; set; }
+        public List<string>? DiasA { get; set; }
         public int? IdEvaluation { get; set; }
 
         public virtual Evaluation? IdEvaluationNavigation { get; set; }

@@ -238,12 +238,45 @@ namespace Clinica.Controllers
 
         [HttpPost]
         [Route("Asistencias")]
-        public IActionResult Asistencias([FromBody] Attendance attendance)
+        public IActionResult Asistencias([FromBody] AsistenciaViewModels objAttendance)
         {
-            _dbcontext.Attendances.Add(attendance);
-            _dbcontext.SaveChanges();
+
+
+             foreach(var fecha in objAttendance.FechaInicio)
+                {
+
+                Attendance asistencia = new Attendance()
+                {
+                    IdPatients = objAttendance.IdPatients,
+                    IdTerapeuta = objAttendance.IdTerapeuta,
+                    IdTherapy = objAttendance.IdTherapy,
+                    FechaInicio = fecha,
+                    TipoAsistencias = objAttendance.TipoAsistencias,
+                    Remarks = objAttendance.Remarks,
+
+                };         
+
+                _dbcontext.Attendances.Add(asistencia);
+                _dbcontext.SaveChanges();
+              }
+
+        
             return Ok("Juan");
         }
+
+
+
+        [HttpPost]
+        [Route("fechas")]
+        public IActionResult Fechas([FromBody] ListaFecha objeto)
+        {
+
+
+
+            return Ok();
+
+        }
+
 
 
         [HttpGet]
@@ -522,18 +555,8 @@ namespace Clinica.Controllers
         }
 
    
-        [HttpPost]
-        [Route("Post")]
-        public IActionResult Post(ListaEnteros obj)
-        {
 
-            foreach (var numero in obj.teras)
-            {
-                _dbcontext.IdtherapistIdtherapies.AddRange(new IdtherapistIdtherapy { Idtherapia = numero, Idterapeuta = obj.id });
-            }
-            _dbcontext.SaveChanges();
-            return Ok();
-        }
+
         [HttpPost]
         [Route("FiltrarGastos")]
         public async Task<IActionResult> FiltrarGastos(Inversion obj)
@@ -770,14 +793,22 @@ namespace Clinica.Controllers
         public IActionResult EliminarCita([FromBody] Buscar obj)
         {
 
-            var resRecu = _dbcontext.Recurrencia.FirstOrDefault(u => u.IdEvaluation == obj.IdEvaluation);
+            var resRecu = _dbcontext.Recurrencia.Where(u => u.IdEvaluation == obj.IdEvaluation).ToList();
+
+
 
             if (resRecu == null)
             {
                 NoContent();
             }
-            _dbcontext.Remove(resRecu);
-            _dbcontext.SaveChanges();
+
+            foreach (var numero in resRecu)
+            {
+                _dbcontext.Recurrencia.Remove(numero);
+                _dbcontext.SaveChanges();
+
+            }
+
 
             var resEva = _dbcontext.Evaluations.FirstOrDefault(u => u.Id == obj.IdEvaluation);
 
@@ -791,6 +822,18 @@ namespace Clinica.Controllers
          
 
 
+            return Ok();
+        }
+        [HttpPost]
+        [Route("Post")]
+        public IActionResult Post(ListaEnteros obj)
+        {
+
+            foreach (var numero in obj.teras)
+            {
+                _dbcontext.IdtherapistIdtherapies.AddRange(new IdtherapistIdtherapy { Idtherapia = numero, Idterapeuta = obj.id });
+            }
+            _dbcontext.SaveChanges();
             return Ok();
         }
 
@@ -820,30 +863,42 @@ namespace Clinica.Controllers
 
         }
 
-        [HttpPost]
-        [Route("EditarRecurrencia")]
-        public IActionResult EditarRecurrencia([FromBody] Recurrencium objeto)
-        {
 
-            Recurrencium oProducto = _dbcontext.Recurrencia.Find(objeto.IdRecurrencia);
+      
 
-            if (oProducto == null)
-            {
-                return BadRequest("producto no encontrado");
-            }
 
-            oProducto.FechaInicio = objeto.FechaInicio is null ? oProducto.FechaInicio : objeto.FechaInicio;
-            oProducto.Repetir = objeto.Repetir is null ? oProducto.Repetir : objeto.Repetir;
-            oProducto.Frecuencia = objeto.Frecuencia is null ? oProducto.Frecuencia : objeto.Frecuencia;
-            oProducto.Dias = objeto.Dias is null ? oProducto.Dias : objeto.Dias;
-            oProducto.IdEvaluation = objeto.IdEvaluation is null ? oProducto.IdEvaluation : objeto.IdEvaluation;
+        //[HttpPost]
+        //[Route("EditarRecurrencia")]
+        //public IActionResult EditarRecurrencia([FromBody] Modelos.Recurrencia objeto)
+        //{
+        //    Recurrencium dias = new Recurrencium();
 
-            _dbcontext.Recurrencia.Update(oProducto);
-            _dbcontext.SaveChanges();
+        //    Recurrencium oProducto = _dbcontext.Recurrencia.Find(objeto.IdRecurrencia);
 
-            return Ok();
 
-        }
+        //    _dbcontext.Recurrencia.Remove(oProducto);
+        //    _dbcontext.SaveChanges();
+
+        //    if (oProducto == null)
+        //    {
+        //        return BadRequest("producto no encontrado");
+        //    }
+
+
+
+
+        //        oProducto.FechaInicio = objeto.FechaInicio is null ? oProducto.FechaInicio : objeto.FechaInicio;
+        //        oProducto.Repetir = objeto.Repetir is null ? oProducto.Repetir : objeto.Repetir;
+        //        oProducto.Frecuencia = objeto.Frecuencia is null ? oProducto.Frecuencia : objeto.Frecuencia;
+        //        oProducto.IdEvaluation = objeto.IdEvaluation is null ? oProducto.IdEvaluation : objeto.IdEvaluation;
+
+
+        //    _dbcontext.Recurrencia.Update(oProducto);
+        //    _dbcontext.SaveChanges();
+
+        //    return Ok();
+
+        //}
 
 
 
@@ -890,7 +945,8 @@ namespace Clinica.Controllers
                                         Terapeuta = new User
                                         {
                                             IdUser = u.IdUser,
-                                            Names = u.Names
+                                            Names = u.Names,
+                                            Apellido = u.Apellido
                                         },
                                         Terapia = new Therapy
                                         {
@@ -974,7 +1030,8 @@ namespace Clinica.Controllers
 
                                             Terapeuta = new User
                                             {
-                                                Names = u.Names
+                                                Names = u.Names,
+                                                Apellido = u.Apellido
                                             },
                                             Terapia = new Therapy
                                             {
@@ -1015,7 +1072,8 @@ namespace Clinica.Controllers
 
                                         Terapeuta = new User
                                         {
-                                            Names = u.Names
+                                            Names = u.Names,
+                                            Apellido = u.Apellido
                                         },
                                         Terapia = new Therapy
                                         {
@@ -1114,7 +1172,7 @@ namespace Clinica.Controllers
             return olista;
         }
 
-
+        
         [Route("ListaEvaluacions")]
         public object ListaEvaluacions([FromBody] Buscar obj)
         {
@@ -1134,14 +1192,15 @@ namespace Clinica.Controllers
 
                     lista = result.ToList();
 
+
                     foreach (var listado in lista)
                     {
                         var idEva = listado.IdEvaluation;
 
 
                         var resultEva = from e in dbContext.Evaluations
-                                        join a in dbContext.Attendances on new { e.IdPatients, e.IdTerapeuta,e.IdTherapy} equals new { a.IdPatients,a.IdTerapeuta ,a.IdTherapy }
-                                        where e.Id == idEva
+                                        join a in dbContext.Attendances on new {e.IdTerapeuta} equals new { a.IdTerapeuta  }
+                                        where e.Id == idEva && e.IdTerapeuta == obj.IdTerapeuta
                                         select new
                                         {
                                             Evaluation = e,
