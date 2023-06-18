@@ -1,8 +1,10 @@
 ﻿using Clinica.Modelos;
 using Clinica.SqlTables;
+using Elasticsearch.Net;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using Nest;
 using System;
 using System.Data;
@@ -25,71 +27,20 @@ namespace Clinica.Controllers
             _dbcontext = _context;
         }
 
-
-
         [HttpPost]
-        [Route("CrearEvaluacion")]
-        public IActionResult CrearEvaluacion([FromBody] Evaluation objeto)
+        [Route("EditarRecurrencia")]
+        public IActionResult EditarRecurrencia([FromBody] Recurrencia obj)
         {
             try
             {
-                _dbcontext.Evaluations.Add(objeto);
-                _dbcontext.SaveChanges();
+                var id = obj.IdRecurrencia;
 
-                var idObtenido =  CreatedAtAction(nameof(ObtenerUsuario), new { id = objeto.Id }, objeto);
-
-                var reId = objeto.Id;
-
-                return Ok(reId);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status200OK, new { mensaje = ex.Message });
-            }
-         
-        }
-
-
-        [HttpPost]
-        [Route("CrearRecurrencia")]
-        public IActionResult CrearRecurrencia([FromBody] Recurrencia obj)
-        {
-           
-            try
-            {
-
-                if(obj.IdRecurrencia > 0)
+                var oProducto = _dbcontext.Recurrencia.Where(r => r.IdEvaluation == obj.IdEvaluation).ToList();
+                foreach (var numero in oProducto)
                 {
-                    var id = obj.IdRecurrencia;
-
-                    var oProducto = _dbcontext.Recurrencia.Where(r => r.IdEvaluation == obj.IdEvaluation).ToList();
-                    foreach (var numero in oProducto)
-                    {
-                         _dbcontext.Recurrencia.Remove(numero);
-                        _dbcontext.SaveChanges();
-
-                    }
-
-
-               
-                    foreach (var numero in obj.DiasA)
-                    {
-                        Recurrencium recu = new Recurrencium();
-                        recu.Dias = numero;
-                        recu.FechaInicio = obj.FechaInicio;
-                        recu.Repetir = obj.Repetir;
-                        recu.IdEvaluation = obj.IdEvaluation;
-                        recu.Frecuencia = obj.Frecuencia;
-
-                        _dbcontext.Recurrencia.Add(recu);
-                        _dbcontext.SaveChanges();
-                    }
-
-
-                    return Ok();
+                    _dbcontext.Recurrencia.Remove(numero);
+                    _dbcontext.SaveChanges();
                 }
-
-              
 
                 foreach (var numero in obj.DiasA)
                 {
@@ -103,17 +54,70 @@ namespace Clinica.Controllers
                     _dbcontext.Recurrencia.Add(recu);
                     _dbcontext.SaveChanges();
                 }
-              
 
-              
                 return Ok();
+
+            }
+            catch (Exception ex) {
+                return  BadRequest();
+            }
+
+        }
+
+        [HttpPost]
+        [Route("CrearEvaluacion")]
+        public IActionResult CrearEvaluacion([FromBody] Citas objeto)
+        {
+            try
+            {
+                string MensajeError = string.Empty;
+
+                Evaluation datos = new Evaluation()
+                {
+                    IdPatients = objeto.IdPatients,
+                    IdTherapy = objeto.IdTherapy,
+                    Price = objeto.Price,
+                    IdTerapeuta = objeto.IdTerapeuta,
+                    Visitas = objeto.Visitas,
+                    IdConsultorio = objeto.IdConsultorio
+                };
+
+                 _dbcontext.Evaluations.Add(datos);
+                 _dbcontext.SaveChanges();
+
+                var idObtenido = datos.Id;
+                if (idObtenido > 0 && objeto.Dias.Count > 0)
+                {
+                    foreach (var numero in objeto.Dias)
+                    {
+                        Recurrencium recu = new Recurrencium();
+                        recu.Dias = numero;
+                        recu.FechaInicio = objeto.FechaInicio;
+                        recu.Repetir = objeto.Repetir;
+                        recu.IdEvaluation = idObtenido;
+                        recu.Frecuencia = objeto.Frecuencia;
+
+                        _dbcontext.Recurrencia.Add(recu);
+                         _dbcontext.SaveChanges();
+                    }
+                    return Ok();
+                }
+                else
+                {
+                    Evaluation remover = _dbcontext.Evaluations.FirstOrDefault(e => e.Id == idObtenido);
+                    _dbcontext.Evaluations.Remove(remover);
+                    _dbcontext.SaveChanges();   
+                    return BadRequest(MensajeError = "Error al crear un cita");
+
+                }
+
             }
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status200OK, new { mensaje = ex.Message });
             }
-        }
 
+        }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Evaluation>> ObtenerUsuario(int id)
@@ -126,57 +130,6 @@ namespace Clinica.Controllers
             return resId;
         }
 
-
-
-
-        /*
-
-        [HttpPost]
-        [Route("GastosGanancia")]
-        public List<Buscar> GastosGanancia([FromBody] Buscar obj)
-        {
-            List<Buscar> lista = new List<Buscar>();
-            try
-            {
-                using (var conexion = new SqlConnection(cadenaSQL))
-                {
-
-                    SqlCommand cmd = new SqlCommand("sp_buscar", conexion);
-                    cmd.Parameters.AddWithValue("@fechainicio", obj.FechaInicio);
-                    cmd.Parameters.AddWithValue("@FechaFinal", obj.FechaFinal);
-                    cmd.CommandType = CommandType.StoredProcedure;
-                 
-                    conexion.Open();
-                    cmd.ExecuteNonQuery();
-
-                    using (SqlDataReader dr = cmd.ExecuteReader())
-                    {
-                        while (dr.Read())
-                        {
-                            lista.Add(
-                                new Buscar()
-                                {
-
-                                    Price = Convert.ToInt32(dr["Price"], new CultureInfo("es-PE")),
-                                    Label = dr["Label"].ToString(),
-                                    FechaInicio = Convert.ToDateTime(dr["FechaInicio"])
-                               
-                                }
-                                );
-                        }
-                    }
-
-                }
-               
-            }
-            catch (Exception ex)
-            {
-                lista = new List<Buscar>();
-            }
-            return lista;
-        }
-
-        */
 
     }
 }

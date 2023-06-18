@@ -14,6 +14,7 @@ using System.Globalization;
 using Microsoft.AspNetCore.Cors;
 using System.Data.SqlClient;
 using System.Linq;
+using Serilog;
 
 namespace Clinica.Controllers
 {
@@ -24,10 +25,14 @@ namespace Clinica.Controllers
     {
         public readonly dbapiContext _dbcontext;
         private readonly string cadenaSQL;
-        public ClinicaController(dbapiContext _context, IConfiguration config)
+        private readonly ILogger<ClinicaController> _logger;
+
+        public ClinicaController(dbapiContext _context, IConfiguration config, ILogger<ClinicaController> logger)
         {
             cadenaSQL = config.GetConnectionString("CadenaSQL");
             _dbcontext = _context;
+            _logger = logger;
+
         }
 
         [HttpGet]
@@ -343,7 +348,7 @@ namespace Clinica.Controllers
             return Ok();
         }
 
-        //  <----------------------------- filtrar citas -------------------------> 
+        //  <----------------------------- filtrar Moscu -------------------------> 
 
         [HttpGet]
         [Route("Moscu")]
@@ -818,10 +823,7 @@ namespace Clinica.Controllers
             }
             _dbcontext.Remove(resEva);
             _dbcontext.SaveChanges();
-
-         
-
-
+            
             return Ok();
         }
         [HttpPost]
@@ -837,154 +839,180 @@ namespace Clinica.Controllers
             return Ok();
         }
 
+
         [HttpPost]
         [Route("EditarCitas")]
-        public IActionResult EditarCitas([FromBody] Evaluation objeto )
+        public IActionResult EditarCitas([FromBody] Citas objeto )
         {
-
-            Evaluation oProducto = _dbcontext.Evaluations.Find(objeto.Id);
-
-            if (oProducto == null)
+            try
             {
-                return BadRequest("producto no encontrado");
+         
+                Evaluation oProducto =  _dbcontext.Evaluations.Find(objeto.Id);
+
+                if (oProducto == null)
+                {
+                    return BadRequest("producto no encontrado");
+                }
+
+                oProducto.IdPatients = objeto.IdPatients is null ? oProducto.IdPatients : objeto.IdPatients;
+                oProducto.IdTherapy = objeto.IdTherapy is null ? oProducto.IdTherapy : objeto.IdTherapy;
+                oProducto.Price = objeto.Price is null ? oProducto.Price : objeto.Price;
+                oProducto.IdTerapeuta = objeto.IdTerapeuta is null ? oProducto.IdTerapeuta : objeto.IdTerapeuta;
+                oProducto.Visitas = objeto.Visitas is null ? oProducto.Visitas : objeto.Visitas;
+                oProducto.IdConsultorio = objeto.IdConsultorio is null ? oProducto.IdConsultorio : objeto.IdConsultorio;
+
+                _dbcontext.Evaluations.Update(oProducto);
+                  _dbcontext.SaveChanges();
+           
+                return Ok();
+
+            }catch(Exception ex)
+            {
+                return BadRequest();
             }
 
-            oProducto.IdPatients = objeto.IdPatients is null ? oProducto.IdPatients : objeto.IdPatients;
-            oProducto.IdTherapy = objeto.IdTherapy is null ? oProducto.IdTherapy : objeto.IdTherapy;
-            oProducto.Price = objeto.Price is null ? oProducto.Price : objeto.Price;
-            oProducto.IdTerapeuta = objeto.IdTerapeuta is null ? oProducto.IdTerapeuta : objeto.IdTerapeuta;
-            oProducto.Visitas = objeto.Visitas is null ? oProducto.Visitas : objeto.Visitas;
-            oProducto.IdConsultorio = objeto.IdConsultorio is null ? oProducto.IdConsultorio : objeto.IdConsultorio;
-
-            _dbcontext.Evaluations.Update(oProducto);
-            _dbcontext.SaveChanges();
-
-            return Ok(objeto.Id);
 
         }
 
+     
 
-      
-
-
-        //[HttpPost]
-        //[Route("EditarRecurrencia")]
-        //public IActionResult EditarRecurrencia([FromBody] Modelos.Recurrencia objeto)
-        //{
-        //    Recurrencium dias = new Recurrencium();
-
-        //    Recurrencium oProducto = _dbcontext.Recurrencia.Find(objeto.IdRecurrencia);
-
-
-        //    _dbcontext.Recurrencia.Remove(oProducto);
-        //    _dbcontext.SaveChanges();
-
-        //    if (oProducto == null)
-        //    {
-        //        return BadRequest("producto no encontrado");
-        //    }
-
-
-
-
-        //        oProducto.FechaInicio = objeto.FechaInicio is null ? oProducto.FechaInicio : objeto.FechaInicio;
-        //        oProducto.Repetir = objeto.Repetir is null ? oProducto.Repetir : objeto.Repetir;
-        //        oProducto.Frecuencia = objeto.Frecuencia is null ? oProducto.Frecuencia : objeto.Frecuencia;
-        //        oProducto.IdEvaluation = objeto.IdEvaluation is null ? oProducto.IdEvaluation : objeto.IdEvaluation;
-
-
-        //    _dbcontext.Recurrencia.Update(oProducto);
-        //    _dbcontext.SaveChanges();
-
-        //    return Ok();
-
-        //}
-
-
-
+   
 
         [HttpGet]
         [Route("Citas")]
-        public object Citas()
+        public async Task<object> Citas()
         {
+       
             string mensaje = string.Empty;
             List<Evaluation> viewModal = new List<Evaluation>();
             List<UserEvaluacion> olista = new List<UserEvaluacion>();
             List<Buscar> recu = new List<Buscar>();
+            List<Buscar> InfoProcesada = new List<Buscar>();
 
-
-            using (var dbContext = _dbcontext)
+            try
             {
-                var result = from r in dbContext.Recurrencia
-                             select new Buscar
-                             {
-                                 FechaInicio = r.FechaInicio,
-                                 Repetir = r.Repetir,
-                                 Frecuencia = r.Frecuencia,
-                                 Dias = r.Dias,
-                                 IdEvaluation = r.IdEvaluation,
-                                 IdRecurrencia = r.IdRecurrencia
-                             };
 
-                recu = result.ToList();
-
-                foreach (var listado in recu)
+    
+                using (var dbContext = _dbcontext)
                 {
-                    var idEva = listado.IdEvaluation;
+                    var result = from r in dbContext.Recurrencia
+                                 
+                                 select new Buscar
+                                 {
+                                     FechaInicio = r.FechaInicio,
+                                     Repetir = r.Repetir,
+                                     Frecuencia = r.Frecuencia,
+                                     Dias = r.Dias,
+                                     IdEvaluation = r.IdEvaluation,
+                                     IdRecurrencia = r.IdRecurrencia
+                                 };
+
+                    recu = await result.ToListAsync();
+
+                    List<Recurrencia> prose = new List<Recurrencia>()
+                    {
+                        new Recurrencia
+                        {
+                            Repetir = 4,
+                            Frecuencia = "mensual",
+                            Dias = "jueves",
+                            IdEvaluation  = 2
+
+                        },
+                           new Recurrencia
+                        {
+                            Repetir = 4,
+                            Frecuencia = "mensual",
+                            Dias = "jueves",
+                            IdEvaluation  = 2
+
+                        },
+                              new Recurrencia
+                        {
+                            Repetir = 4,
+                            Frecuencia = "mensual",
+                            Dias = "jueves",
+                            IdEvaluation  = 3
+
+                        }
+                    };
+                    foreach (var pro in recu)
+                    {
+                        var idEva = pro.IdEvaluation;
+                        Buscar recuProcesada = InfoProcesada.FirstOrDefault(f => f.IdEvaluation == idEva);
+
+                        if (recuProcesada == null)
+                        {
+                            InfoProcesada.Add(pro); // Agregar 'pro' en lugar de 'recuProcesada'
+                        }
+                    }
 
 
-                    var resultEva = from e in dbContext.Evaluations
-                                    join c in dbContext.Consultorios on e.IdConsultorio equals c.IdConsultorio
-                                    join t in dbContext.Therapies on e.IdTherapy equals t.IdTherapy
-                                    join p in dbContext.Patients on e.IdPatients equals p.IdPatients
-                                    join u in dbContext.Users on e.IdTerapeuta equals u.IdUser
-                                    where e.Id == idEva && p.Activo == true
-                                    select new Modelos.UserEvaluacion
-                                    {
-                                        IdEvaluacion = idEva,
-                                        Terapeuta = new User
+                    foreach (var listado in InfoProcesada)
+                    {
+                   
+                        var idEva = listado.IdEvaluation;
+
+
+                        var resultEva = from e in dbContext.Evaluations
+                                        join c in dbContext.Consultorios on e.IdConsultorio equals c.IdConsultorio
+                                        join t in dbContext.Therapies on e.IdTherapy equals t.IdTherapy
+                                        join p in dbContext.Patients on e.IdPatients equals p.IdPatients
+                                        join u in dbContext.Users on e.IdTerapeuta equals u.IdUser
+                                        where e.Id == idEva && p.Activo == true
+                                        select new Modelos.UserEvaluacion
                                         {
-                                            IdUser = u.IdUser,
-                                            Names = u.Names,
-                                            Apellido = u.Apellido
-                                        },
-                                        Terapia = new Therapy
-                                        {
-                                            IdTherapy = t.IdTherapy,
-                                            Label = t.Label
-                                        },
+                                            IdEvaluacion = idEva,
+                                            Terapeuta = new User
+                                            {
+                                                IdUser = u.IdUser,
+                                                Names = u.Names,
+                                                Apellido = u.Apellido
+                                            },
+                                            Terapia = new Therapy
+                                            {
+                                                IdTherapy = t.IdTherapy,
+                                                Label = t.Label
+                                            },
 
-                                        Paciente = new Patient
-                                        {   IdPatients = p.IdPatients,
-                                            Name = p.Name,
-                                            Activo = p.Activo
-                                        },
-                                        FechaInicio = listado.FechaInicio,
-                                        Price = e.Price,
+                                            Paciente = new Patient
+                                            {   IdPatients = p.IdPatients,
+                                                Name = p.Name,
+                                                Activo = p.Activo
+                                            },
+                                            FechaInicio = listado.FechaInicio,
+                                            Price = e.Price,
 
-                                        Consultorio = new Modelos.Consultorio
-                                        {
-                                            IdConsultorio = c.IdConsultorio,
-                                            Nombre = c.Nombre,
+                                            Consultorio = new Modelos.Consultorio
+                                            {
+                                                IdConsultorio = c.IdConsultorio,
+                                                Nombre = c.Nombre,
                                             
-                                        },
+                                            },
 
-                                        Repetir = listado.Repetir,
-                                        Frecuencia = listado.Frecuencia,
-                                        Dias = listado.Dias,
+                                            Repetir = listado.Repetir,
+                                            Frecuencia = listado.Frecuencia,
+                                            Dias = listado.Dias,
 
-                                        Recurrencia = new SqlTables.Recurrencium
-                                        {
-                                            IdRecurrencia = (int)listado.IdRecurrencia
-                                        }
-                                    };
+                                            Recurrencia = new SqlTables.Recurrencium
+                                            {
+                                                IdRecurrencia = (int)listado.IdRecurrencia
+                                            }
+                                        };
 
-                    olista.AddRange(resultEva.Distinct().ToList());
+                        olista.AddRange(resultEva.Distinct().ToList());
+
+
+                    }
+
                 }
 
             }
-
-
+            catch (Exception ex)
+            {
+                _logger.LogInformation("el error en las citas es :" , ex);
+                return ex;
+            }
             return olista;
         }
 
@@ -1225,9 +1253,6 @@ namespace Clinica.Controllers
                                                  FechaInicio = r.Attendance.FechaInicio,
                                                  Price = r.Evaluation.Price
                                              };
-
-                    
-
 
                         olista.AddRange(resultPatients.ToList());
                     }

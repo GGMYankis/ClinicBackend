@@ -3,7 +3,10 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Serilog;
+
 var builder = WebApplication.CreateBuilder(args);
+
 
 builder.Services.AddDbContext<dbapiContext>(opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("CadenaSQL")));
 
@@ -57,6 +60,7 @@ var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 
+// tell app to use serilog
 
 app.UseSwagger();
 app.UseSwaggerUI();

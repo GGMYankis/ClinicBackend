@@ -59,11 +59,13 @@ namespace Clinica.Controllers
             var message = "Usuario no encontardo";
             user = _dbcontext.Users.FirstOrDefault(u => u.Email == usuario.Email && u.Password == usuario.Password);
             if(user == null) {
-                return StatusCode(StatusCodes.Status200OK, new { message, user }); ;
+                return BadRequest(message);
             }
                 var keyBytes = Encoding.ASCII.GetBytes(secretKey);
                 var claims = new ClaimsIdentity();
-                claims.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Names));
+            claims.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.IdUser.ToString()));
+
+            claims.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Names));
                 claims.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Email));
                 var tokenDescriptor = new SecurityTokenDescriptor
                 {
@@ -123,10 +125,132 @@ namespace Clinica.Controllers
         }
 
 
+        // trabajando aqui
+        /*
+        [HttpPost("buscarPrimerLunes")]
+        public IActionResult BuscarPrimerLunes(BusquedaDiaSemanaModel model)
+        {
+            int repetir = model.Repetir;
+            string frecuencia = model.Frecuencia;
+
+            DateTime fechaActual = model.Fecha;
+
+            List<DateTime> fechasEncontradas = new List<DateTime>();
+
+            if (model.Frecuencia == "diario")
+            {
+                foreach (var diaSemana in model.DiasSemana)
+                {
+
+                    while (fechaActual.DayOfWeek != diaSemana)
+                    {
+                        fechaActual = fechaActual.AddDays(1);
+                    }
+                    fechasEncontradas.Add(fechaActual);
+
+                }
+            }
+
+            if (model.Frecuencia == "mensual")
+            {
+                for (int i = 0; i < repetir; i++)
+                {
+                    foreach (var diaSemana in model.DiasSemana)
+                    {
+
+                        while (fechaActual.DayOfWeek != diaSemana)
+                        {
+                            fechaActual = fechaActual.AddDays(1);
+                        }
+                        fechasEncontradas.Add(fechaActual);
+
+                    }
+                }
+            }
+
+            if (model.Frecuencia == "semanal")
+            {
+                for (int i = 0; i < repetir; i++)
+                {
+                    foreach (var diaSemana in model.DiasSemana)
+                    {
+
+                        while (fechaActual.DayOfWeek != diaSemana)
+                        {
+                            fechaActual = fechaActual.AddDays(1);
+                        }
+                        fechasEncontradas.Add(fechaActual);
+
+                    }
+                }
+            }
+
+            foreach (var diaSemana in fechasEncontradas)
+            {
+                DateTime fechaEnviar = diaSemana;
+
+                int dia = (int)fechaEnviar.DayOfWeek;
+                string? diaS = string.Empty;
+
+                if (dia == 1)
+                {
+                    diaS = "lunes";
+                }
+                if (dia == 2)
+                {
+                    diaS = "martes";
+                }
+                if (dia == 3)
+                {
+                    diaS = "miercoles";
+                }
+
+                if (frecuencia == "diario")
+                {
+
+                    for (int i = 0; i < model.Repetir; i++)
+                    {
+                        Recurrencium recu = new Recurrencium()
+                        {
+                            Dias = diaS,
+                            FechaInicio = diaSemana,
+                            Repetir = model.Repetir,
+                            IdEvaluation = model.IdEvaluation,
+                            Frecuencia = model.Frecuencia,
+                        };
+
+                        _dbcontext.Recurrencia.Add(recu);
+                        _dbcontext.SaveChanges();
+                    }
+
+                }
 
 
- 
+                if (frecuencia == "mensual")
+                {
+                    Recurrencium recus = new Recurrencium()
+                    {
+                        Dias = diaS,
+                        FechaInicio = diaSemana,
+                        Repetir = model.Repetir,
+                        IdEvaluation = model.IdEvaluation,
+                        Frecuencia = model.Frecuencia,
+                    };
 
+                    _dbcontext.Recurrencia.Add(recus);
+                    _dbcontext.SaveChanges();
+                }
+
+
+
+            }
+
+            return Ok(fechasEncontradas);
+        }
     }
+
+
+        */
+}
 }
 

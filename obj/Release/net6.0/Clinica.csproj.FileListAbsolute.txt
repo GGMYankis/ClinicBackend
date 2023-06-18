@@ -150,3 +150,13 @@ C:\Users\LENOVO\Documents\GitHub\ClinicBackend\obj\Release\net6.0\refint\Clinica
 C:\Users\LENOVO\Documents\GitHub\ClinicBackend\obj\Release\net6.0\Clinica.pdb
 C:\Users\LENOVO\Documents\GitHub\ClinicBackend\obj\Release\net6.0\Clinica.genruntimeconfig.cache
 C:\Users\LENOVO\Documents\GitHub\ClinicBackend\obj\Release\net6.0\ref\Clinica.dll
+C:\Users\LENOVO\Documents\GitHub\ClinicBackend\bin\Release\net6.0\Microsoft.Extensions.DependencyModel.dll
+C:\Users\LENOVO\Documents\GitHub\ClinicBackend\bin\Release\net6.0\Serilog.dll
+C:\Users\LENOVO\Documents\GitHub\ClinicBackend\bin\Release\net6.0\Serilog.AspNetCore.dll
+C:\Users\LENOVO\Documents\GitHub\ClinicBackend\bin\Release\net6.0\Serilog.Extensions.Hosting.dll
+C:\Users\LENOVO\Documents\GitHub\ClinicBackend\bin\Release\net6.0\Serilog.Extensions.Logging.dll
+C:\Users\LENOVO\Documents\GitHub\ClinicBackend\bin\Release\net6.0\Serilog.Formatting.Compact.dll
+C:\Users\LENOVO\Documents\GitHub\ClinicBackend\bin\Release\net6.0\Serilog.Settings.Configuration.dll
+C:\Users\LENOVO\Documents\GitHub\ClinicBackend\bin\Release\net6.0\Serilog.Sinks.Console.dll
+C:\Users\LENOVO\Documents\GitHub\ClinicBackend\bin\Release\net6.0\Serilog.Sinks.Debug.dll
+C:\Users\LENOVO\Documents\GitHub\ClinicBackend\bin\Release\net6.0\Serilog.Sinks.File.dll
