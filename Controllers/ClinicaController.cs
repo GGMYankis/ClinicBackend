@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Cors;
 using System.Data.SqlClient;
 using System.Linq;
 using Serilog;
+using System.Security.Cryptography;
 
 namespace Clinica.Controllers
 {
@@ -1287,8 +1288,6 @@ namespace Clinica.Controllers
 
                 }
 
-
-
                 foreach (var asis in olista)
                 {
                
@@ -1296,7 +1295,11 @@ namespace Clinica.Controllers
                     var idPaciente = asis.IdPatients;
                     var idTerapia = asis.IdTherapy;
                     var fechaAgroup = asis.FechaInicio.ToString().Substring(0,2);
-                    var fechUI = asis.FechaInicio.ToString().Substring(0,2);
+
+                    string formattedDate = asis.FechaInicio.Value.ToString("dd-MMM");
+                    formattedDate = formattedDate.TrimEnd('.');
+
+                   
                     var longitud = olista.Count;
 
                     var resultAbono = from ab in dbContext.AbonosTerapias
@@ -1321,13 +1324,11 @@ namespace Clinica.Controllers
                         abono = 0;
                     }
 
-                   
-
-
+                  
                     var paciRepetido = olistaUI.Find(p => p.Paciente.IdPatients == idPaciente && p.Terapia.IdTherapy == idTerapia);
                     if(paciRepetido != null)
                     {
-                        paciRepetido.fechas.Add(fechaAgroup + ",");
+                        paciRepetido.fechas.Add(" " + ","+formattedDate);
                         paciRepetido.APagar = paciRepetido.fechas.Count * paciRepetido.Terapia.Price;
 
                     }
@@ -1359,7 +1360,8 @@ namespace Clinica.Controllers
                                              Terapia = new Therapy
                                              {
                                                  IdTherapy = t.IdTherapy,
-                                                 Label = t.Description,
+                                                 Label = t.Label,
+                                                 Description = t.Description,
                                                  Price = t.Price
 
                                              },
@@ -1371,7 +1373,7 @@ namespace Clinica.Controllers
                                              },
                                              fechas = new List<string>
                                              {
-                                                 fechUI + "," 
+                                               formattedDate
                                              },
                                              APagar = (fechaAgroup.Length == 0) ? t.Price : fechaAgroup.Length * t.Price,
                                              CantidadAsistencia = cantidad,
@@ -1392,15 +1394,3 @@ namespace Clinica.Controllers
     }
 }
 
-
-
-
-//var resulAbono = from a in dbContext.AbonosTerapias
-//                 where a.IdPaciente == idPaciente
-//                 select new AbonosTerapia
-//                 {
-
-//                 }
-
-
-// .ToString("yyyy-MM-dd").Substring(0, 2)
