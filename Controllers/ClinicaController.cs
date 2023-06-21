@@ -909,33 +909,6 @@ namespace Clinica.Controllers
 
                     recu = await result.ToListAsync();
 
-                    List<Recurrencia> prose = new List<Recurrencia>()
-                    {
-                        new Recurrencia
-                        {
-                            Repetir = 4,
-                            Frecuencia = "mensual",
-                            Dias = "jueves",
-                            IdEvaluation  = 2
-
-                        },
-                           new Recurrencia
-                        {
-                            Repetir = 4,
-                            Frecuencia = "mensual",
-                            Dias = "jueves",
-                            IdEvaluation  = 2
-
-                        },
-                              new Recurrencia
-                        {
-                            Repetir = 4,
-                            Frecuencia = "mensual",
-                            Dias = "jueves",
-                            IdEvaluation  = 3
-
-                        }
-                    };
                     foreach (var pro in recu)
                     {
                         var idEva = pro.IdEvaluation;
@@ -1268,8 +1241,166 @@ namespace Clinica.Controllers
             return olista;
         }
 
+
+        [HttpPost]
+        [Route("ReportesPago")]
+        public IActionResult ReportesPago([FromBody] Attendance obj)
+        {
+            List<Attendance>  olista = new List<Attendance>();  
+            List<PagoTerapeuta>  olistaUI = new List<PagoTerapeuta>();
+            List<PagoTerapeuta>  cola = new List<PagoTerapeuta>();
+            decimal? abono = 0;
+
+            using (var dbContext = _dbcontext)
+            {
+
+                if(obj.IdPatients == 0)
+                {
+                    var resultAll = from a in dbContext.Attendances
+                                 where a.FechaInicio >= obj.FechaInicio && a.FechaInicio <= obj.FechaFinal
+                                 select new Attendance
+                                 {
+                                     IdAsistencias = a.IdAsistencias,
+                                     FechaInicio = a.FechaInicio,
+                                     IdTerapeuta = a.IdTerapeuta,
+                                     IdPatients = a.IdPatients,
+                                     IdTherapy = a.IdTherapy
+                                 };
+                    olista = resultAll.ToList();
+
+
+                }
+                else
+                {
+                    var result = from a in dbContext.Attendances
+                                 where a.FechaInicio >= obj.FechaInicio && a.FechaInicio <= obj.FechaFinal &&
+                                 a.IdPatients == obj.IdPatients
+                                 select new Attendance
+                                 {
+                                     IdAsistencias = a.IdAsistencias,
+                                     FechaInicio = a.FechaInicio,
+                                     IdTerapeuta = a.IdTerapeuta,
+                                     IdPatients = a.IdPatients,
+                                     IdTherapy = a.IdTherapy
+                                 };
+                    olista = result.ToList();
+
+                }
+
+
+
+                foreach (var asis in olista)
+                {
+               
+                    var idAsis = asis.IdAsistencias;
+                    var idPaciente = asis.IdPatients;
+                    var idTerapia = asis.IdTherapy;
+                    var fechaAgroup = asis.FechaInicio.ToString().Substring(0,2);
+                    var fechUI = asis.FechaInicio.ToString().Substring(0,2);
+                    var longitud = olista.Count;
+
+                    var resultAbono = from ab in dbContext.AbonosTerapias
+                                      where ab.Fecha >= obj.FechaInicio && ab.Fecha <= obj.FechaFinal &&
+                                      ab.IdPaciente == idPaciente && ab.IdTerapia == idTerapia
+                                      select new Abono
+                                      {
+                                          Monto = ab.MontoPagado
+                                      };
+
+
+                    if (resultAbono.Any())
+                    {
+                        foreach (var abo in resultAbono)
+                            {
+                                abono = 0;
+                                abono = abo.Monto;
+                            };
+                    }
+                    else
+                    {
+                        abono = 0;
+                    }
+
+                   
+
+
+                    var paciRepetido = olistaUI.Find(p => p.Paciente.IdPatients == idPaciente && p.Terapia.IdTherapy == idTerapia);
+                    if(paciRepetido != null)
+                    {
+                        paciRepetido.fechas.Add(fechaAgroup + ",");
+                        paciRepetido.APagar = paciRepetido.fechas.Count * paciRepetido.Terapia.Price;
+
+                    }
+                    else
+                    {
+                        var veses = _dbcontext.Attendances.Where(a => a.IdPatients == idPaciente && a.IdTherapy == idTerapia).ToList();
+                        var cantidad = veses.Count();
+                        fechaAgroup = "";
+                        var resultAsis = from a in dbContext.Attendances
+                                         join t in dbContext.Therapies on a.IdTherapy equals t.IdTherapy
+                                         join p in dbContext.Patients on a.IdPatients equals p.IdPatients
+                                         join u in dbContext.Users on a.IdTerapeuta equals u.IdUser
+                                         where a.IdAsistencias == idAsis
+                                         select new Modelos.PagoTerapeuta
+                                         {
+
+                                             asistencia = new Attendance
+                                             {
+                                                 IdAsistencias = a.IdAsistencias,
+                                                 FechaInicio = a.FechaInicio
+
+                                             },
+                                             Paciente = new Patient
+                                             {
+                                                 IdPatients = p.IdPatients,
+                                                 Name = p.Name
+
+                                             },
+                                             Terapia = new Therapy
+                                             {
+                                                 IdTherapy = t.IdTherapy,
+                                                 Label = t.Description,
+                                                 Price = t.Price
+
+                                             },
+                                             Terapeuta = new User
+                                             {
+                                                 Names = u.Names,
+                                                 Apellido = u.Apellido
+
+                                             },
+                                             fechas = new List<string>
+                                             {
+                                                 fechUI + "," 
+                                             },
+                                             APagar = (fechaAgroup.Length == 0) ? t.Price : fechaAgroup.Length * t.Price,
+                                             CantidadAsistencia = cantidad,
+                                             Abono = abono
+                                         };
+
+
+                        olistaUI.AddRange(resultAsis.ToList());
+                    }
+                   
+                }
+
+            }
+
+            return Ok(olistaUI);
+
+        }
     }
 }
 
 
 
+
+//var resulAbono = from a in dbContext.AbonosTerapias
+//                 where a.IdPaciente == idPaciente
+//                 select new AbonosTerapia
+//                 {
+
+//                 }
+
+
+// .ToString("yyyy-MM-dd").Substring(0, 2)
