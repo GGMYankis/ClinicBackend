@@ -1259,7 +1259,8 @@ namespace Clinica.Controllers
                 {
                     var resultAll = from a in dbContext.Attendances
                                  where a.FechaInicio >= obj.FechaInicio && a.FechaInicio <= obj.FechaFinal
-                                 select new Attendance
+                                    orderby a.FechaInicio ascending
+                                    select new Attendance
                                  {
                                      IdAsistencias = a.IdAsistencias,
                                      FechaInicio = a.FechaInicio,
@@ -1268,14 +1269,13 @@ namespace Clinica.Controllers
                                      IdTherapy = a.IdTherapy
                                  };
                     olista = resultAll.ToList();
-
-
                 }
                 else
                 {
                     var result = from a in dbContext.Attendances
                                  where a.FechaInicio >= obj.FechaInicio && a.FechaInicio <= obj.FechaFinal &&
                                  a.IdPatients == obj.IdPatients
+                                 orderby a.FechaInicio ascending
                                  select new Attendance
                                  {
                                      IdAsistencias = a.IdAsistencias,
@@ -1305,6 +1305,7 @@ namespace Clinica.Controllers
                     var resultAbono = from ab in dbContext.AbonosTerapias
                                       where ab.Fecha >= obj.FechaInicio && ab.Fecha <= obj.FechaFinal &&
                                       ab.IdPaciente == idPaciente && ab.IdTerapia == idTerapia
+                                     
                                       select new Abono
                                       {
                                           Monto = ab.MontoPagado
@@ -1328,7 +1329,7 @@ namespace Clinica.Controllers
                     var paciRepetido = olistaUI.Find(p => p.Paciente.IdPatients == idPaciente && p.Terapia.IdTherapy == idTerapia);
                     if(paciRepetido != null)
                     {
-                        paciRepetido.fechas.Add(" " + ","+formattedDate);
+                        paciRepetido.fechas.Add("," + " " + formattedDate);
                         paciRepetido.APagar = paciRepetido.fechas.Count * paciRepetido.Terapia.Price;
 
                     }
