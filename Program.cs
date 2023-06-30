@@ -1,16 +1,14 @@
-using Clinica.SqlTables;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Serilog;
+using Clinica.SqlTables;
 
 var builder = WebApplication.CreateBuilder(args);
 
 
 builder.Services.AddDbContext<dbapiContext>(opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("CadenaSQL")));
-
-
 
 var misReglasCors = "ReglasCors";
 builder.Services.AddCors(options =>
@@ -23,6 +21,9 @@ builder.Services.AddCors(options =>
                           .AllowAnyMethod();
                       });
 });
+
+ 
+
 
 
 // Add services to the container.
@@ -55,7 +56,7 @@ builder.Services.AddAuthentication(config =>
     };
 });
 
-
+//builder.Services.AddScoped<ICitas, Citas>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

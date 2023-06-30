@@ -160,3 +160,10 @@ C:\Users\LENOVO\Documents\GitHub\ClinicBackend\bin\Debug\net6.0\Serilog.Settings
 C:\Users\LENOVO\Documents\GitHub\ClinicBackend\bin\Debug\net6.0\Serilog.Sinks.Console.dll
 C:\Users\LENOVO\Documents\GitHub\ClinicBackend\bin\Debug\net6.0\Serilog.Sinks.Debug.dll
 C:\Users\LENOVO\Documents\GitHub\ClinicBackend\bin\Debug\net6.0\Serilog.Sinks.File.dll
+C:\Users\LENOVO\Documents\GitHub\ClinicBackend\bin\Debug\net6.0\Microsoft.Extensions.DependencyInjection.dll
+C:\Users\LENOVO\Documents\GitHub\ClinicBackend\bin\Debug\net6.0\AllServicios.dll
+C:\Users\LENOVO\Documents\GitHub\ClinicBackend\bin\Debug\net6.0\ConexionSql.dll
+C:\Users\LENOVO\Documents\GitHub\ClinicBackend\bin\Debug\net6.0\ViewModal.dll
+C:\Users\LENOVO\Documents\GitHub\ClinicBackend\bin\Debug\net6.0\AllServicios.pdb
+C:\Users\LENOVO\Documents\GitHub\ClinicBackend\bin\Debug\net6.0\ConexionSql.pdb
+C:\Users\LENOVO\Documents\GitHub\ClinicBackend\bin\Debug\net6.0\ViewModal.pdb

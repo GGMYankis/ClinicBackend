@@ -42,7 +42,7 @@ namespace Clinica.Controllers
             try
             {
                 var email = User.Claims.ElementAt(1).Value;
-                var user = _dbcontext.Users.FirstOrDefault(u => u.Email == email);
+                var user = _dbcontext.Users.FirstOrDefault(u => u.Names == email);
                 return StatusCode(StatusCodes.Status200OK, new {  user }); ;
             }
             catch (Exception)
@@ -70,7 +70,7 @@ namespace Clinica.Controllers
                 var tokenDescriptor = new SecurityTokenDescriptor
                 {
                     Subject = claims,
-                    Expires = DateTime.UtcNow.AddMinutes(5),
+                    Expires = DateTime.UtcNow.AddMinutes(30),
                     SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(keyBytes), SecurityAlgorithms.HmacSha256Signature)
                 };
                 var tokenHandler = new JwtSecurityTokenHandler();

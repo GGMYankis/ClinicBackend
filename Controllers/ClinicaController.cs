@@ -190,7 +190,7 @@ namespace Clinica.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status200OK, new { mensaje = ex.Message });
+               return BadRequest();
             }
         }
 
@@ -198,6 +198,8 @@ namespace Clinica.Controllers
         [Route("EditarTerapia")]
         public IActionResult EditarTerapia([FromBody] Therapy objeto)
         {
+            var mensaje = string.Empty;
+
             Therapy oProducto = _dbcontext.Therapies.Find(objeto.IdTherapy);
             if (oProducto == null)
             {
@@ -209,13 +211,15 @@ namespace Clinica.Controllers
                 oProducto.Description = objeto.Description is null ? oProducto.Description : objeto.Description;
                 oProducto.Price = objeto.Price is null ? oProducto.Price : objeto.Price;
                 oProducto.Porcentaje = objeto.Porcentaje is null ? oProducto.Porcentaje : objeto.Porcentaje;
+                oProducto.PorcentajeCentro = objeto.PorcentajeCentro is null ? oProducto.PorcentajeCentro : objeto.PorcentajeCentro;
                 _dbcontext.Therapies.Update(oProducto);
                 _dbcontext.SaveChanges();
-                return StatusCode(StatusCodes.Status200OK, new { mensaje = "ok" });
+                 return StatusCode(StatusCodes.Status200OK, new { mensaje = "ok" });
+             
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status200OK, new { mensaje = ex.Message });
+                return BadRequest(mensaje = "Hubo un error al crear la terapia");
             }
         }
 
@@ -504,28 +508,6 @@ namespace Clinica.Controllers
             }
         }
 
-        [HttpPost]
-        [Route("GetEvaluacionByTerapeuta")]
-        public async Task<IActionResult> GetEvaluacionByTerapeuta(IdtherapistIdtherapy terapeutaId)
-        {
-            List<Probar> viewModal = new List<Probar>();
-            var evaluaciones = await _dbcontext.IdtherapistIdtherapies.Where(e => e.Idterapeuta == terapeutaId.Idterapeuta).ToListAsync();
-
-            if (evaluaciones != null)
-            {
-                foreach (var cita in evaluaciones)
-                {
-                    var idsTerapia = cita.Idtherapia;
-                    var terapia = await FiltrarTerapia(idsTerapia);
-
-                    Probar nuevoObjeto = new Probar();
-                    nuevoObjeto.NombreTerapia = terapia;
-                    viewModal.Add(nuevoObjeto);
-                }
-            }
-
-            return Ok(viewModal);
-        }
 
         [HttpPost]
         [Route("BuscarPacientePorTerapeuta")]
@@ -721,9 +703,6 @@ namespace Clinica.Controllers
             return Ok();
         }
 
-
-
-
         [HttpPost]
         [Route("CrearAbono")]
         public IActionResult CrearAbono([FromBody] Abono objeto)
@@ -739,9 +718,6 @@ namespace Clinica.Controllers
                 return StatusCode(StatusCodes.Status200OK, new { mensaje = ex.Message });
             }
         }
-
-
-
 
         [HttpPost]
         [Route("Probar")]
@@ -790,9 +766,6 @@ namespace Clinica.Controllers
                 return StatusCode(StatusCodes.Status200OK, new { mensaje = ex.Message });
             }
         }
-
-
-
 
         [HttpPost]
         [Route("EliminarCita")]
@@ -875,123 +848,61 @@ namespace Clinica.Controllers
 
         }
 
-     
-
-   
-
-        [HttpGet]
-        [Route("Citas")]
-        public async Task<object> Citas()
-        {
-       
-            string mensaje = string.Empty;
-            List<Evaluation> viewModal = new List<Evaluation>();
-            List<UserEvaluacion> olista = new List<UserEvaluacion>();
-            List<Buscar> recu = new List<Buscar>();
-            List<Buscar> InfoProcesada = new List<Buscar>();
-
-            try
-            {
-
-    
-                using (var dbContext = _dbcontext)
-                {
-                    var result = from r in dbContext.Recurrencia
-                                 
-                                 select new Buscar
-                                 {
-                                     FechaInicio = r.FechaInicio,
-                                     Repetir = r.Repetir,
-                                     Frecuencia = r.Frecuencia,
-                                     Dias = r.Dias,
-                                     IdEvaluation = r.IdEvaluation,
-                                     IdRecurrencia = r.IdRecurrencia
-                                 };
-
-                    recu = await result.ToListAsync();
-
-                    foreach (var pro in recu)
-                    {
-                        var idEva = pro.IdEvaluation;
-                        Buscar recuProcesada = InfoProcesada.FirstOrDefault(f => f.IdEvaluation == idEva);
-
-                        if (recuProcesada == null)
-                        {
-                            InfoProcesada.Add(pro); // Agregar 'pro' en lugar de 'recuProcesada'
-                        }
-                    }
-
-
-                    foreach (var listado in InfoProcesada)
-                    {
-                   
-                        var idEva = listado.IdEvaluation;
-
-
-                        var resultEva = from e in dbContext.Evaluations
-                                        join c in dbContext.Consultorios on e.IdConsultorio equals c.IdConsultorio
-                                        join t in dbContext.Therapies on e.IdTherapy equals t.IdTherapy
-                                        join p in dbContext.Patients on e.IdPatients equals p.IdPatients
-                                        join u in dbContext.Users on e.IdTerapeuta equals u.IdUser
-                                        where e.Id == idEva && p.Activo == true
-                                        select new Modelos.UserEvaluacion
-                                        {
-                                            IdEvaluacion = idEva,
-                                            Terapeuta = new User
-                                            {
-                                                IdUser = u.IdUser,
-                                                Names = u.Names,
-                                                Apellido = u.Apellido
-                                            },
-                                            Terapia = new Therapy
-                                            {
-                                                IdTherapy = t.IdTherapy,
-                                                Label = t.Label
-                                            },
-
-                                            Paciente = new Patient
-                                            {   IdPatients = p.IdPatients,
-                                                Name = p.Name,
-                                                Activo = p.Activo
-                                            },
-                                            FechaInicio = listado.FechaInicio,
-                                            Price = e.Price,
-
-                                            Consultorio = new Modelos.Consultorio
-                                            {
-                                                IdConsultorio = c.IdConsultorio,
-                                                Nombre = c.Nombre,
-                                            
-                                            },
-
-                                            Repetir = listado.Repetir,
-                                            Frecuencia = listado.Frecuencia,
-                                            Dias = listado.Dias,
-
-                                            Recurrencia = new SqlTables.Recurrencium
-                                            {
-                                                IdRecurrencia = (int)listado.IdRecurrencia
-                                            }
-                                        };
-
-                        olista.AddRange(resultEva.Distinct().ToList());
-
-
-                    }
-
-                }
-
-            }
-            catch (Exception ex)
-            {
-                _logger.LogInformation("el error en las citas es :" , ex);
-                return ex;
-            }
-            return olista;
-        }
-
 
         [HttpPost]
+        [Route("GetEvaluacionByTerapeuta")]
+        public async Task<IActionResult> GetEvaluacionByTerapeuta(IdtherapistIdtherapy terapeutaId)
+        {
+            List<IdtherapistIdtherapy> filtrada = new List<IdtherapistIdtherapy>();
+            List<Therapy> therapies = new List<Therapy>();
+            List<Therapy> distinctTherapies = new List<Therapy>();
+
+
+            using (var dbContext = _dbcontext)
+            {
+                var resultEva = from e in dbContext.IdtherapistIdtherapies
+                                where e.Idterapeuta == terapeutaId.Idterapeuta
+                                select new IdtherapistIdtherapy
+                                {
+                                    Idtherapia = e.Idtherapia
+                                };
+
+
+                filtrada.AddRange(resultEva);
+
+
+                foreach(var aProcesar in filtrada)
+                {
+                 
+                    var idTerapia = aProcesar.Idtherapia;
+
+
+                    var filtro = therapies.Find(t => t.IdTherapy == idTerapia);
+
+                    if(filtro == null)
+                    {
+                        var res = from e in dbContext.Therapies
+                                  join t in dbContext.Therapies on e.IdTherapy equals t.IdTherapy
+                                  where e.IdTherapy == idTerapia
+                                  select new Therapy
+                                  {
+                                      IdTherapy = t.IdTherapy,
+                                      Label = t.Label
+                                  };
+
+                        therapies.AddRange(res.ToList());
+                    }
+
+               
+                };
+            }
+
+             return Ok(therapies);
+
+            }
+
+
+         [HttpPost]
         [Route("FiltrarConsultorios")]
         public object FiltrarConsultorios(Buscar obj)
         {
@@ -1251,6 +1162,8 @@ namespace Clinica.Controllers
             List<PagoTerapeuta>  olistaUI = new List<PagoTerapeuta>();
             List<PagoTerapeuta>  cola = new List<PagoTerapeuta>();
             decimal? abono = 0;
+            //decimal? Cobrar;
+            //var A_Favor = 0;
 
             using (var dbContext = _dbcontext)
             {
@@ -1287,7 +1200,6 @@ namespace Clinica.Controllers
                     olista = result.ToList();
 
                 }
-
                 foreach (var asis in olista)
                 {
                
@@ -1295,7 +1207,8 @@ namespace Clinica.Controllers
                     var idPaciente = asis.IdPatients;
                     var idTerapia = asis.IdTherapy;
                     var fechaAgroup = asis.FechaInicio.ToString().Substring(0,2);
-
+                    
+                   
                     string formattedDate = asis.FechaInicio.Value.ToString("dd-MMM");
                     formattedDate = formattedDate.TrimEnd('.');
 
@@ -1303,12 +1216,14 @@ namespace Clinica.Controllers
                     var longitud = olista.Count;
 
                     var resultAbono = from ab in dbContext.AbonosTerapias
+                                      join t in dbContext.Therapies on ab.IdTerapia equals t.IdTherapy
                                       where ab.Fecha >= obj.FechaInicio && ab.Fecha <= obj.FechaFinal &&
                                       ab.IdPaciente == idPaciente && ab.IdTerapia == idTerapia
                                      
                                       select new Abono
                                       {
-                                          Monto = ab.MontoPagado
+                                          Monto = ab.MontoPagado,
+                                          priceTerapia = (int)t.Price
                                       };
 
 
@@ -1316,9 +1231,28 @@ namespace Clinica.Controllers
                     {
                         foreach (var abo in resultAbono)
                             {
-                                abono = 0;
-                                abono = abo.Monto;
-                            };
+
+                            var paciRepetido2 = olistaUI.Find(p => p.Paciente.IdPatients == idPaciente && p.Terapia.IdTherapy == idTerapia);
+
+                            abono = 0;
+                            abono = abo.Monto;
+
+                            //fechaAgroup = "";
+
+                            //if(paciRepetido2 != null)
+                            //{
+                            //    paciRepetido2.fechas.Add("," + " " + formattedDate);
+                            //    var aPagar2 = paciRepetido2.fechas.Count * abo.priceTerapia;
+                            //    var cobrarS = aPagar2 - abono; 
+                            //}
+                            //else
+                            //{
+                            //    var aPagar3 =  abo.priceTerapia;
+                            //    var cobrarP = aPagar3 - abono;
+                            //    Cobrar = cobrarP;
+
+                            //}
+                        };
                     }
                     else
                     {
@@ -1374,11 +1308,13 @@ namespace Clinica.Controllers
                                              },
                                              fechas = new List<string>
                                              {
-                                               formattedDate
+                                                 formattedDate
                                              },
                                              APagar = (fechaAgroup.Length == 0) ? t.Price : fechaAgroup.Length * t.Price,
                                              CantidadAsistencia = cantidad,
-                                             Abono = abono
+                                             Abono = abono,
+                                             //Cobrar = Cobrar
+
                                          };
 
 
@@ -1392,6 +1328,153 @@ namespace Clinica.Controllers
             return Ok(olistaUI);
 
         }
+
+        [HttpGet]
+        [Route("Listadoasistencia")]
+        public IActionResult ListadoAsistencia()
+        {
+
+            List<Attendance> listado = new List<Attendance>();
+            List<Asistencia> AttendanceUi = new List<Asistencia>();
+
+            using (var dbcontext = _dbcontext)
+            {
+
+
+                    var result = from r in dbcontext.Attendances
+                                 select r;
+
+
+                    listado = result.ToList();
+
+
+                    foreach (var attendance in listado)
+                    {
+
+
+                        var IdAsistencias = attendance.IdAsistencias;
+
+                        var resulProcedada = from e in dbcontext.Attendances
+                                             join t in dbcontext.Therapies on e.IdTherapy equals t.IdTherapy
+                                             join p in dbcontext.Patients on e.IdPatients equals p.IdPatients
+                                             join u in dbcontext.Users on e.IdTerapeuta equals u.IdUser
+                                             where e.IdAsistencias == IdAsistencias
+                                             select new Modelos.Asistencia
+                                             {
+                                                 Therapeua = u,
+                                                 Terapias = t,
+                                                 Pacientes = p,
+                                                 Asistencias = e
+                                             };
+
+
+                    AttendanceUi.AddRange(resulProcedada.ToList());
+
+                }
+
+
+            }
+
+            return Ok(AttendanceUi);
+
+        }
+
+
+        [HttpPost]
+        [Route("EditarAsistencia")]
+        public IActionResult EditarAsistencia([FromBody] Attendance objeto)
+        {
+
+            Attendance oProducto = _dbcontext.Attendances.Find(objeto.IdAsistencias);
+            if (oProducto == null)
+            {
+                return BadRequest("error al editar la terapia");
+            }
+
+            oProducto.IdTerapeuta = objeto.IdTerapeuta is null ? oProducto.IdTerapeuta : objeto.IdTerapeuta;
+            oProducto.IdPatients = objeto.IdPatients is null ? oProducto.IdPatients : objeto.IdPatients;
+            oProducto.IdTherapy = objeto.IdTherapy is null ? oProducto.IdTherapy : objeto.IdTherapy;
+            oProducto.FechaFinal = objeto.FechaFinal is null ? oProducto.FechaFinal : objeto.FechaFinal;
+            oProducto.TipoAsistencias = objeto.TipoAsistencias is null ? oProducto.TipoAsistencias : objeto.TipoAsistencias;
+            oProducto.Remarks = objeto.Remarks is null ? oProducto.Remarks : objeto.Remarks;
+            oProducto.FechaInicio = objeto.FechaInicio is null ? oProducto.FechaInicio : objeto.FechaInicio;
+
+            _dbcontext.Attendances.Update(oProducto);
+            _dbcontext.SaveChanges();
+
+            return Ok();
+
+
+        }
+
+        [HttpPost]
+        [Route("EliminarAsistencia")]
+        public IActionResult EliminarAsistencia([FromBody] Attendance objeto)
+        {
+
+            Attendance oProducto = _dbcontext.Attendances.Find(objeto.IdAsistencias);
+            if (oProducto == null)
+            {
+                return BadRequest("error al eliminar la terapia");
+            }
+
+
+            _dbcontext.Attendances.Remove(oProducto);
+            _dbcontext.SaveChanges();
+
+            return Ok();
+
+
+        }
+
+
+        [HttpPost]
+        [Route("FiltrandoAsistencia")]
+        public IActionResult FiltrandoAsistencia([FromBody] Attendance obj)
+        {
+
+            List<Attendance> listado = new List<Attendance>();
+            List<Asistencia> AttendanceUi = new List<Asistencia>();
+
+            using (var dbcontext = _dbcontext)
+            {
+
+                var result = from r in dbcontext.Attendances
+                             where r.FechaInicio >= obj.FechaInicio && r.FechaInicio <= obj.FechaFinal
+                             select r;
+
+                listado = result.ToList();
+
+                foreach (var attendance in listado)
+                {
+
+                    var IdAsistencias = attendance.IdAsistencias;
+
+                    var resulProcedada = from e in dbcontext.Attendances
+                                         join t in dbcontext.Therapies on e.IdTherapy equals t.IdTherapy
+                                         join p in dbcontext.Patients on e.IdPatients equals p.IdPatients
+                                         join u in dbcontext.Users on e.IdTerapeuta equals u.IdUser
+                                         where e.IdAsistencias == IdAsistencias
+                                         select new Modelos.Asistencia
+                                         {
+                                             Therapeua = u,
+                                             Terapias = t,
+                                             Pacientes = p,
+                                             Asistencias = e
+                                         };
+
+
+                    AttendanceUi.AddRange(resulProcedada.ToList());
+                }
+
+
+            }
+            return Ok(AttendanceUi);
+
+        }
+
+
+
     }
 }
 

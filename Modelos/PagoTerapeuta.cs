@@ -12,5 +12,6 @@ namespace Clinica.Modelos
         public int? APagar { get; set; }
         public int? CantidadAsistencia { get; set; }
         public decimal? Abono { get; set; }
+        public decimal? Cobrar { get; set; }
     }
 }
