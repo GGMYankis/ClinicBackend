@@ -1345,7 +1345,7 @@ namespace Clinica.Controllers
                                  select r;
 
 
-                    listado = result.ToList();
+               listado = result.ToList();
 
 
                     foreach (var attendance in listado)
