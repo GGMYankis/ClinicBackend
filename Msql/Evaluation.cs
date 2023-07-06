@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Clinica.SqlTables
+namespace Clinica.Msql
 {
     public partial class Evaluation
     {
@@ -17,6 +17,7 @@ namespace Clinica.SqlTables
         public int? IdTerapeuta { get; set; }
         public bool? Visitas { get; set; }
         public int? IdConsultorio { get; set; }
+        public int? FirstPrice { get; set; }
 
         public virtual Consultorio? IdConsultorioNavigation { get; set; }
         public virtual ICollection<Recurrencium> Recurrencia { get; set; }

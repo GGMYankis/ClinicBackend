@@ -1,4 +1,4 @@
-﻿using Clinica.SqlTables;
+﻿using Clinica.Msql;
 
 namespace Clinica.Modelos
 {
@@ -11,6 +11,7 @@ namespace Clinica.Modelos
         public int? IdEvaluacion { get; set; }
         public Consultorio? Consultorio { get; set; }
         public int? Price { get; set; }
+        public int? FirstPrice { get; set; }
         public int? IdConsultorio { get; set; }
         
         public DateTime? FechaInicio { get; set; }

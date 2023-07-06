@@ -11,7 +11,7 @@ using System.Runtime.Intrinsics.Arm;
 using Nest;
 using Microsoft.AspNetCore.Authorization;
 using System.Net.Http.Headers;
-using Clinica.SqlTables;
+using Clinica.Msql;
 using Newtonsoft.Json.Linq;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
@@ -22,6 +22,7 @@ namespace Clinica.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+   
     public class AutenticacionController : ControllerBase
     {
         private readonly string secretKey;
@@ -125,132 +126,6 @@ namespace Clinica.Controllers
         }
 
 
-        // trabajando aqui
-        /*
-        [HttpPost("buscarPrimerLunes")]
-        public IActionResult BuscarPrimerLunes(BusquedaDiaSemanaModel model)
-        {
-            int repetir = model.Repetir;
-            string frecuencia = model.Frecuencia;
-
-            DateTime fechaActual = model.Fecha;
-
-            List<DateTime> fechasEncontradas = new List<DateTime>();
-
-            if (model.Frecuencia == "diario")
-            {
-                foreach (var diaSemana in model.DiasSemana)
-                {
-
-                    while (fechaActual.DayOfWeek != diaSemana)
-                    {
-                        fechaActual = fechaActual.AddDays(1);
-                    }
-                    fechasEncontradas.Add(fechaActual);
-
-                }
-            }
-
-            if (model.Frecuencia == "mensual")
-            {
-                for (int i = 0; i < repetir; i++)
-                {
-                    foreach (var diaSemana in model.DiasSemana)
-                    {
-
-                        while (fechaActual.DayOfWeek != diaSemana)
-                        {
-                            fechaActual = fechaActual.AddDays(1);
-                        }
-                        fechasEncontradas.Add(fechaActual);
-
-                    }
-                }
-            }
-
-            if (model.Frecuencia == "semanal")
-            {
-                for (int i = 0; i < repetir; i++)
-                {
-                    foreach (var diaSemana in model.DiasSemana)
-                    {
-
-                        while (fechaActual.DayOfWeek != diaSemana)
-                        {
-                            fechaActual = fechaActual.AddDays(1);
-                        }
-                        fechasEncontradas.Add(fechaActual);
-
-                    }
-                }
-            }
-
-            foreach (var diaSemana in fechasEncontradas)
-            {
-                DateTime fechaEnviar = diaSemana;
-
-                int dia = (int)fechaEnviar.DayOfWeek;
-                string? diaS = string.Empty;
-
-                if (dia == 1)
-                {
-                    diaS = "lunes";
-                }
-                if (dia == 2)
-                {
-                    diaS = "martes";
-                }
-                if (dia == 3)
-                {
-                    diaS = "miercoles";
-                }
-
-                if (frecuencia == "diario")
-                {
-
-                    for (int i = 0; i < model.Repetir; i++)
-                    {
-                        Recurrencium recu = new Recurrencium()
-                        {
-                            Dias = diaS,
-                            FechaInicio = diaSemana,
-                            Repetir = model.Repetir,
-                            IdEvaluation = model.IdEvaluation,
-                            Frecuencia = model.Frecuencia,
-                        };
-
-                        _dbcontext.Recurrencia.Add(recu);
-                        _dbcontext.SaveChanges();
-                    }
-
-                }
-
-
-                if (frecuencia == "mensual")
-                {
-                    Recurrencium recus = new Recurrencium()
-                    {
-                        Dias = diaS,
-                        FechaInicio = diaSemana,
-                        Repetir = model.Repetir,
-                        IdEvaluation = model.IdEvaluation,
-                        Frecuencia = model.Frecuencia,
-                    };
-
-                    _dbcontext.Recurrencia.Add(recus);
-                    _dbcontext.SaveChanges();
-                }
-
-
-
-            }
-
-            return Ok(fechasEncontradas);
-        }
-    }
-
-
-        */
 }
 }
 

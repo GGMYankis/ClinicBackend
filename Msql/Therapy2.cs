@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Clinica.SqlTables
+namespace Clinica.Msql
 {
     public partial class Therapy2
     {

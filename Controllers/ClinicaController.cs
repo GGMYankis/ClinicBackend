@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Clinica.Modelos;
-using Clinica.SqlTables;
+using Clinica.Msql;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Data;
+using System.Data; 
 using Microsoft.AspNetCore.Authorization;
 using Nest;
 using static Nest.JoinField;
@@ -105,8 +105,11 @@ namespace Clinica.Controllers
         {
             try
             {
-                _dbcontext.Patients.Add(objeto);
-                _dbcontext.SaveChanges();
+                objeto.FechaIngreso = DateTime.Now;
+
+              _dbcontext.Patients.Add(objeto);
+              _dbcontext.SaveChanges();
+
                 return StatusCode(StatusCodes.Status200OK, new { mensaje = "ok" });
             }
             catch (Exception ex)
@@ -225,7 +228,7 @@ namespace Clinica.Controllers
 
         [HttpPut]
         [Route("EditarAdmin")]
-        public IActionResult EditarAdmin([FromBody] SqlTables.User objeto)
+        public IActionResult EditarAdmin([FromBody] Msql.User objeto)
         {
             User oProducto = _dbcontext.Users.Find(objeto.IdUser);
             if (oProducto == null)
@@ -310,7 +313,7 @@ namespace Clinica.Controllers
         [Route("Consultorios")]
         public IActionResult Consultorios()
         {
-            List<SqlTables.Consultorio> Lista = new List<SqlTables.Consultorio>();
+            List<Msql.Consultorio> Lista = new List<Msql.Consultorio>();
             try
             {
                 Lista = _dbcontext.Consultorios.ToList();
@@ -322,6 +325,7 @@ namespace Clinica.Controllers
             }
         
         }
+
 
         [HttpGet]
         [Route("terapeuta")]
@@ -389,7 +393,7 @@ namespace Clinica.Controllers
 
         [HttpPost]
         [Route("CrearConsultorio")]
-        public IActionResult CrearConsultorio([FromBody] SqlTables.Consultorio objeto)
+        public IActionResult CrearConsultorio([FromBody] Msql.Consultorio objeto)
         {
             try
             {
@@ -423,7 +427,7 @@ namespace Clinica.Controllers
 
         [HttpPost]
         [Route("EliminarConsultorio")]
-        public IActionResult EliminarConsultorio([FromBody] SqlTables.Consultorio objeto)
+        public IActionResult EliminarConsultorio([FromBody] Msql.Consultorio objeto)
         {
             try
             {
@@ -465,10 +469,10 @@ namespace Clinica.Controllers
 
         [HttpPost]
         [Route("EditarConsultorio")]
-        public IActionResult EditarConsultorio([FromBody] SqlTables.Consultorio objeto)
+        public IActionResult EditarConsultorio([FromBody] Msql.Consultorio objeto)
         {
 
-            SqlTables.Consultorio oProducto = _dbcontext.Consultorios.Find(objeto.IdConsultorio);
+            Msql.Consultorio oProducto = _dbcontext.Consultorios.Find(objeto.IdConsultorio);
 
             if (oProducto == null)
             {
@@ -666,14 +670,6 @@ namespace Clinica.Controllers
             }
         }
 
-        [HttpPost]
-        [Route("AgregarEvento")]
-        public IActionResult AgregarEvento([FromBody] Attendance agenda)
-        {
-            _dbcontext.Attendances.Add(agenda);
-            _dbcontext.SaveChanges();
-            return Ok();
-        }
 
         [HttpPost]
         [Route("EliminarPaciente")]
@@ -831,12 +827,13 @@ namespace Clinica.Controllers
                 oProducto.IdPatients = objeto.IdPatients is null ? oProducto.IdPatients : objeto.IdPatients;
                 oProducto.IdTherapy = objeto.IdTherapy is null ? oProducto.IdTherapy : objeto.IdTherapy;
                 oProducto.Price = objeto.Price is null ? oProducto.Price : objeto.Price;
+                oProducto.FirstPrice = objeto.FirstPrice is null ? oProducto.FirstPrice : objeto.FirstPrice;
                 oProducto.IdTerapeuta = objeto.IdTerapeuta is null ? oProducto.IdTerapeuta : objeto.IdTerapeuta;
                 oProducto.Visitas = objeto.Visitas is null ? oProducto.Visitas : objeto.Visitas;
                 oProducto.IdConsultorio = objeto.IdConsultorio is null ? oProducto.IdConsultorio : objeto.IdConsultorio;
 
                 _dbcontext.Evaluations.Update(oProducto);
-                  _dbcontext.SaveChanges();
+                 _dbcontext.SaveChanges();
            
                 return Ok();
 
@@ -919,6 +916,7 @@ namespace Clinica.Controllers
                              select new Buscar
                              {
                                  FechaInicio = r.FechaInicio,
+                                 Dias= r.Dias,  
                                  IdEvaluation = r.IdEvaluation
                              };
 
@@ -950,6 +948,7 @@ namespace Clinica.Controllers
                                             {
                                                 Label = t.Label
                                             },
+                                            Dias = listado.Dias,
 
                                             Paciente = new Patient
                                             {
@@ -1237,21 +1236,7 @@ namespace Clinica.Controllers
                             abono = 0;
                             abono = abo.Monto;
 
-                            //fechaAgroup = "";
-
-                            //if(paciRepetido2 != null)
-                            //{
-                            //    paciRepetido2.fechas.Add("," + " " + formattedDate);
-                            //    var aPagar2 = paciRepetido2.fechas.Count * abo.priceTerapia;
-                            //    var cobrarS = aPagar2 - abono; 
-                            //}
-                            //else
-                            //{
-                            //    var aPagar3 =  abo.priceTerapia;
-                            //    var cobrarP = aPagar3 - abono;
-                            //    Cobrar = cobrarP;
-
-                            //}
+                        
                         };
                     }
                     else

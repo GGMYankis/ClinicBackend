@@ -1,4 +1,4 @@
-﻿using Clinica.SqlTables;
+﻿using Clinica.Msql;
 
 namespace Clinica.Modelos
 {

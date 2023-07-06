@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace Clinica.SqlTables
+namespace Clinica.Msql
 {
     public partial class dbapiContext : DbContext
     {
@@ -113,6 +113,8 @@ namespace Clinica.SqlTables
 
                 entity.Property(e => e.Id).HasColumnName("id");
 
+                entity.Property(e => e.FirstPrice).HasColumnName("firstPrice");
+
                 entity.HasOne(d => d.IdConsultorioNavigation)
                     .WithMany(p => p.Evaluations)
                     .HasForeignKey(d => d.IdConsultorio)
@@ -210,8 +212,7 @@ namespace Clinica.SqlTables
                     .HasColumnName("Family_settings");
 
                 entity.Property(e => e.FechaIngreso)
-                    .HasMaxLength(100)
-                    .IsUnicode(false)
+                    .HasColumnType("datetime")
                     .HasColumnName("fechaIngreso");
 
                 entity.Property(e => e.Name)
@@ -304,7 +305,6 @@ namespace Clinica.SqlTables
                 entity.Property(e => e.Frecuencia)
                     .HasMaxLength(100)
                     .IsUnicode(false);
-               // entity.Ignore(e => e.Dias);
 
                 entity.HasOne(d => d.IdEvaluationNavigation)
                     .WithMany(p => p.Recurrencia)

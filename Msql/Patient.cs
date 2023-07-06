@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Clinica.SqlTables
+namespace Clinica.Msql
 {
     public partial class Patient
     {
@@ -24,6 +24,6 @@ namespace Clinica.SqlTables
         public string? SpecificMedicalCondition { get; set; }
         public string? Other { get; set; }
         public bool? Activo { get; set; }
-        public string? FechaIngreso { get; set; }
+        public DateTime? FechaIngreso { get; set; }
     }
 }

@@ -1,5 +1,5 @@
 ﻿using Clinica.Modelos;
-using Clinica.SqlTables;
+using Clinica.Msql;
 using Elasticsearch.Net;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
@@ -77,6 +77,7 @@ namespace Clinica.Controllers
                     IdPatients = objeto.IdPatients,
                     IdTherapy = objeto.IdTherapy,
                     Price = objeto.Price,
+                    FirstPrice = objeto.FirstPrice,
                     IdTerapeuta = objeto.IdTerapeuta,
                     Visitas = objeto.Visitas,
                     IdConsultorio = objeto.IdConsultorio
@@ -93,9 +94,10 @@ namespace Clinica.Controllers
                         Recurrencium recu = new Recurrencium();
                         recu.Dias = numero;
                         recu.FechaInicio = objeto.FechaInicio;
-                        recu.Repetir = objeto.Repetir;
                         recu.IdEvaluation = idObtenido;
-                        recu.Frecuencia = objeto.Frecuencia;
+
+                        //   recu.Repetir = objeto.Repetir;
+                        // recu.Frecuencia = objeto.Frecuencia;
 
                         _dbcontext.Recurrencia.Add(recu);
                          _dbcontext.SaveChanges();
@@ -108,7 +110,6 @@ namespace Clinica.Controllers
                     _dbcontext.Evaluations.Remove(remover);
                     _dbcontext.SaveChanges();   
                     return BadRequest(MensajeError = "Error al crear un cita");
-
                 }
 
             }
@@ -116,8 +117,8 @@ namespace Clinica.Controllers
             {
                 return StatusCode(StatusCodes.Status200OK, new { mensaje = ex.Message });
             }
-
         }
+
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Evaluation>> ObtenerUsuario(int id)
