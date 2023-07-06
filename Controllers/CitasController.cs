@@ -17,7 +17,7 @@ namespace Clinica.Controllers
         {
             _dbcontext = _context;
         }
-
+        
 
         [HttpGet]
         [Route("CitasNoUnicas")]
