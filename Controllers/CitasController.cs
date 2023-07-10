@@ -129,8 +129,8 @@ namespace Clinica.Controllers
             string mensaje = string.Empty;
             List<Evaluation> viewModal = new List<Evaluation>();
             List<UserEvaluacion> olista = new List<UserEvaluacion>();
-            List<Buscar> recu = new List<Buscar>();
-            List<Buscar> InfoProcesada = new List<Buscar>();
+            List<Recurrencia> recurrencia = new List<Recurrencia>();
+            List<Recurrencia> recurrenciaProcesada = new List<Recurrencia>();
 
             try
             {
@@ -138,38 +138,44 @@ namespace Clinica.Controllers
                 {
                     var result = from r in dbContext.Recurrencia
 
-                                 select new Buscar
+                                 select new Modelos.Recurrencia
                                  {
                                      FechaInicio = r.FechaInicio,
-                                     Repetir = r.Repetir,
-                                     Frecuencia = r.Frecuencia,
                                      Dias = r.Dias,
                                      IdEvaluation = r.IdEvaluation,
                                      IdRecurrencia = r.IdRecurrencia
                                  };
 
+                    recurrencia = await result.ToListAsync();
 
 
-                    recu = await result.ToListAsync();
+                    foreach (var pro in recurrencia)
+                    {                   
+                        var idEvaluacion = pro.IdEvaluation;
 
+                        Recurrencia recuProcesada = recurrenciaProcesada.FirstOrDefault(f => f.IdEvaluation == idEvaluacion);
 
-                    foreach (var pro in recu)
-                    {
-                        var idEva = pro.IdEvaluation;
-                        Buscar recuProcesada = InfoProcesada.FirstOrDefault(f => f.IdEvaluation == idEva);
 
                         if (recuProcesada == null)
                         {
-                            InfoProcesada.Add(pro); 
+                            recurrenciaProcesada.Add(pro);
+                            string dia = pro.Dias;
+                            pro.DiasA.Add(dia);
                         }
+                        else
+                        {
+                            string dia = pro.Dias;
+
+                            recuProcesada.DiasA.Add(dia);
+                        }
+                       
                     }
 
 
-                    foreach (var listado in InfoProcesada)
+                    foreach (var listado in recurrenciaProcesada)
                     {
 
                         var idEva = listado.IdEvaluation;
-
 
                         var resultEva = from e in dbContext.Evaluations
                                         join c in dbContext.Consultorios on e.IdConsultorio equals c.IdConsultorio
@@ -211,7 +217,7 @@ namespace Clinica.Controllers
 
                                             Repetir = listado.Repetir,
                                             Frecuencia = listado.Frecuencia,
-                                            Dias = listado.Dias,
+                                            DiasUi = listado.DiasA,
 
                                             Recurrencia = new Msql.Recurrencium
                                             {

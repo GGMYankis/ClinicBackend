@@ -251,21 +251,36 @@ namespace Clinica.Controllers
 
         [HttpPost]
         [Route("Asistencias")]
-        public IActionResult Asistencias([FromBody] AsistenciaViewModels objAttendance)
+        public IActionResult Asistencias([FromBody] AsistenciaViewModels obj)
         {
+            string MensajeError = string.Empty;
 
 
-             foreach(var fecha in objAttendance.FechaInicio)
+            Evaluation CitasExistente = _dbcontext.Evaluations.FirstOrDefault(citas => 
+            
+             citas.IdPatients ==  obj.IdPatients && citas.IdTherapy == obj.IdTherapy &&
+             citas.IdTerapeuta == obj.IdTerapeuta
+             
+            );
+
+            if(CitasExistente == null)
+            {
+                return BadRequest(MensajeError = "No existe una cita creada con esta información");
+            }
+
+
+
+            foreach (var fecha in obj.FechaInicio)
                 {
 
                 Attendance asistencia = new Attendance()
                 {
-                    IdPatients = objAttendance.IdPatients,
-                    IdTerapeuta = objAttendance.IdTerapeuta,
-                    IdTherapy = objAttendance.IdTherapy,
+                    IdPatients = obj.IdPatients,
+                    IdTerapeuta = obj.IdTerapeuta,
+                    IdTherapy = obj.IdTherapy,
                     FechaInicio = fecha,
-                    TipoAsistencias = objAttendance.TipoAsistencias,
-                    Remarks = objAttendance.Remarks,
+                    TipoAsistencias = obj.TipoAsistencias,
+                    Remarks = obj.Remarks,
 
                 };         
 
@@ -765,7 +780,7 @@ namespace Clinica.Controllers
 
         [HttpPost]
         [Route("EliminarCita")]
-        public IActionResult EliminarCita([FromBody] Buscar obj)
+        public IActionResult EliminarCita([FromBody] Citas obj)
         {
 
             var resRecu = _dbcontext.Recurrencia.Where(u => u.IdEvaluation == obj.IdEvaluation).ToList();
@@ -1012,77 +1027,6 @@ namespace Clinica.Controllers
             return olista;
         }
 
-        [Route("ListaEvaluacion")]
-        public object ListaEvaluacion([FromBody] Buscar obj)
-        {
-             List<Buscar> lista = new List<Buscar>();
-             List<UserEvaluacion> olista = new List<UserEvaluacion>();
-            List<UserEvaluacion> Terapeutas = new List<UserEvaluacion>();
-            try
-            {
-                using (var dbContext = _dbcontext)
-                {
-                    var result = from r in dbContext.Recurrencia
-                                 where r.FechaInicio >= obj.FechaInicio && r.FechaInicio <= obj.FechaFinal
-                                 select new Buscar
-                                 {
-                                     FechaInicio = r.FechaInicio,
-                                     IdEvaluation = r.IdEvaluation
-                                 };
-
-                    lista = result.ToList();
-
-                    foreach (var listado in lista)
-                    {
-                        var idEva = listado.IdEvaluation;
-
-
-                        var resultEva = from e in dbContext.Evaluations
-                                        join t in dbContext.Therapies on e.IdTherapy equals t.IdTherapy
-                                        join u in dbContext.Users on e.IdTerapeuta equals u.IdUser
-                                        where e.Id == idEva && e.IdTerapeuta == obj.IdTerapeuta
-                                        select new Modelos.UserEvaluacion
-                                        {
-
-                                            Terapeuta = new User
-                                            {   IdUser = u.IdUser,
-                                                Names = u.Names
-                                            },
-                                            Terapia = new Therapy
-                                            {
-                                                Label = t.Label,
-                                                Price = t.Price
-                                            },
-                                            FechaInicio = listado.FechaInicio           
-                                        };
-
-                        olista.AddRange(resultEva.ToList());                 
-                    }
-
-                    foreach (var item in olista)
-                    {
-                        int idTerapeuta = item.Terapeuta.IdUser;
-
-                        bool existeTerapeuta = Terapeutas.Any(item => item.Terapeuta.IdUser == idTerapeuta);
-                        if (existeTerapeuta)
-                        {
-                            Modelos.UserEvaluacion tera = Terapeutas.FirstOrDefault(u => u.Terapeuta.IdUser == idTerapeuta);
-                        }
-                        else
-                        {
-                           
-                        }
-
-                    }
-
-                }
-            }
-            catch (Exception ex)
-            {
-                lista = new List<Buscar>();
-            }
-            return olista;
-        }
 
         
         [Route("ListaEvaluacions")]
@@ -1104,41 +1048,45 @@ namespace Clinica.Controllers
 
                     lista = result.ToList();
 
-
                     foreach (var listado in lista)
                     {
+
+
+
+
                         var idEva = listado.IdEvaluation;
 
+                      UserEvaluacion filtrarTerapeuta = olista.Find(t => t.Terapeuta.IdUser == obj.IdTerapeuta);
 
-                        var resultEva = from e in dbContext.Evaluations
-                                        join a in dbContext.Attendances on new {e.IdTerapeuta} equals new { a.IdTerapeuta  }
-                                        where e.Id == idEva && e.IdTerapeuta == obj.IdTerapeuta
-                                        select new
-                                        {
-                                            Evaluation = e,
-                                            Attendance = a
-                                        };
-
-
-                        foreach (var todos in resultEva)
+                        if (filtrarTerapeuta == null)
                         {
+                            var resultEva = from e in dbContext.Evaluations
+                                            join a in dbContext.Attendances on new { e.IdTerapeuta } equals new { a.IdTerapeuta }
+                                            where e.Id == idEva && e.IdTerapeuta == obj.IdTerapeuta
+                                            select new
+                                            {
+                                                Evaluation = e,
+                                                Attendance = a
+                                            };
+
+                            var resultPatients = from r in resultEva
+                                                 join p in dbContext.Patients on r.Attendance.IdPatients equals p.IdPatients
+                                                 join t in dbContext.Therapies on r.Attendance.IdTherapy equals t.IdTherapy
+                                                 join u in dbContext.Users on r.Attendance.IdTerapeuta equals u.IdUser
+                                                 select new Modelos.UserEvaluacion
+                                                 {
+
+                                                     Paciente = p,
+                                                     Terapia = t,
+                                                     Terapeuta = u,
+                                                     FechaInicio = r.Attendance.FechaInicio,
+                                                     Price = r.Evaluation.Price
+                                                 };
+
+                            olista.AddRange(resultPatients.ToList());
                         }
 
-                        var resultPatients = from r in resultEva
-                                             join p in dbContext.Patients on r.Attendance.IdPatients equals p.IdPatients
-                                           join t in dbContext.Therapies on r.Attendance.IdTherapy equals t.IdTherapy
-                                           join u in dbContext.Users on r.Attendance.IdTerapeuta equals u.IdUser
-                                             select new Modelos.UserEvaluacion
-                                             {
-                                               
-                                                 Paciente = p,
-                                                 Terapia = t,
-                                                 Terapeuta = u,
-                                                 FechaInicio = r.Attendance.FechaInicio,
-                                                 Price = r.Evaluation.Price
-                                             };
-
-                        olista.AddRange(resultPatients.ToList());
+                              
                     }
 
 
@@ -1149,7 +1097,8 @@ namespace Clinica.Controllers
             {
                 lista = new List<Buscar>();
             }
-            return olista;
+                            return olista;
+
         }
 
 

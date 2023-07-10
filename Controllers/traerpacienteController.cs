@@ -68,9 +68,41 @@ namespace Clinica.Controllers
         [Route("CrearEvaluacion")]
         public IActionResult CrearEvaluacion([FromBody] Citas objeto)
         {
+            List<Evaluation> olista = new List<Evaluation>();
+
             try
             {
                 string MensajeError = string.Empty;
+
+                var CitaExistente = _dbcontext.Evaluations.Where(cita => 
+                   cita.IdPatients == objeto.IdPatients && cita.IdTerapeuta == objeto.IdTerapeuta &&
+                   cita.IdTherapy == objeto.IdTherapy && cita.IdConsultorio == objeto.IdConsultorio
+                );
+
+                olista = CitaExistente.ToList();
+
+
+                 foreach(var obj in olista)
+                {
+                    Recurrencium recuExistente = _dbcontext.Recurrencia.FirstOrDefault(recu => recu.IdEvaluation == obj.Id);
+
+                    if (recuExistente.FechaInicio == objeto.FechaInicio)
+                    {
+                        return BadRequest(MensajeError = "Ya existe un registro con esta información");
+                    }
+                }
+
+                 if(objeto.Price == null)
+                {
+                    Therapy terapia = _dbcontext.Therapies.FirstOrDefault(t => t.IdTherapy == objeto.IdTherapy);
+
+
+                    if(terapia != null)
+                    {
+                        objeto.Price = terapia.Price;
+                    }
+
+                }
 
                 Evaluation datos = new Evaluation()
                 {
@@ -120,16 +152,6 @@ namespace Clinica.Controllers
         }
 
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Evaluation>> ObtenerUsuario(int id)
-        {
-            var resId = await _dbcontext.Evaluations.FindAsync(id);
-            if (resId == null)
-            {
-                return NotFound();
-            }
-            return resId;
-        }
 
 
     }

@@ -18,6 +18,7 @@ namespace Clinica.Modelos
         public int? Repetir { get; set; }
         public string? Frecuencia { get; set; }
         public string? Dias { get; set; }
+        public List<string>? DiasUi { get; set; }
         public Recurrencium? Recurrencia { get; set; }
 
         

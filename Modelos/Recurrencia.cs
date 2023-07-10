@@ -13,5 +13,14 @@ namespace Clinica.Modelos
         public int? IdEvaluation { get; set; }
 
         public virtual Evaluation? IdEvaluationNavigation { get; set; }
+
+
+
+        public Recurrencia()
+        {
+            DiasA = new List<string>();
+        }
     }
+
+
 }
