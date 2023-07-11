@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace Clinica.Msql
+namespace Clinica.NewSql
 {
     public partial class dbapiContext : DbContext
     {
@@ -19,6 +19,7 @@ namespace Clinica.Msql
         public virtual DbSet<Abono> Abonos { get; set; } = null!;
         public virtual DbSet<AbonosTerapia> AbonosTerapias { get; set; } = null!;
         public virtual DbSet<Attendance> Attendances { get; set; } = null!;
+        public virtual DbSet<Config> Configs { get; set; } = null!;
         public virtual DbSet<Consultorio> Consultorios { get; set; } = null!;
         public virtual DbSet<Evaluation> Evaluations { get; set; } = null!;
         public virtual DbSet<IdtherapistIdtherapy> IdtherapistIdtherapies { get; set; } = null!;
@@ -29,9 +30,9 @@ namespace Clinica.Msql
         public virtual DbSet<Recurrencium> Recurrencia { get; set; } = null!;
         public virtual DbSet<Rol> Rols { get; set; } = null!;
         public virtual DbSet<Therapy> Therapies { get; set; } = null!;
-        public virtual DbSet<Therapy2> Therapy2s { get; set; } = null!;
         public virtual DbSet<User> Users { get; set; } = null!;
         public virtual DbSet<Usuario> Usuarios { get; set; } = null!;
+        public virtual DbSet<Zaronasistencium> Zaronasistencia { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -87,6 +88,24 @@ namespace Clinica.Msql
                     .HasColumnName("remarks");
 
                 entity.Property(e => e.TipoAsistencias)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<Config>(entity =>
+            {
+                entity.HasKey(e => e.IdKey)
+                    .HasName("PK__config__3FBEE7401D99C4F3");
+
+                entity.ToTable("config");
+
+                entity.Property(e => e.IdKey).HasColumnName("idKey");
+
+                entity.Property(e => e.Key)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Value)
                     .HasMaxLength(100)
                     .IsUnicode(false);
             });
@@ -347,31 +366,6 @@ namespace Clinica.Msql
                     .IsUnicode(false);
             });
 
-            modelBuilder.Entity<Therapy2>(entity =>
-            {
-                entity.HasKey(e => e.IdTherapy)
-                    .HasName("PK__therapy2__87DD5B7C8B6FAAB1");
-
-                entity.ToTable("therapy2");
-
-                entity.Property(e => e.Description)
-                    .HasMaxLength(100)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.Email)
-                    .HasMaxLength(100)
-                    .IsUnicode(false)
-                    .HasColumnName("email");
-
-                entity.Property(e => e.Label)
-                    .HasMaxLength(100)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.Value)
-                    .HasMaxLength(100)
-                    .IsUnicode(false);
-            });
-
             modelBuilder.Entity<User>(entity =>
             {
                 entity.HasKey(e => e.IdUser)
@@ -433,6 +427,20 @@ namespace Clinica.Msql
                 entity.Property(e => e.Value)
                     .HasMaxLength(100)
                     .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<Zaronasistencium>(entity =>
+            {
+                entity.ToTable("zaronasistencia");
+
+                entity.Property(e => e.Id)
+                    .ValueGeneratedNever()
+                    .HasColumnName("id");
+
+                entity.Property(e => e.Descripcion)
+                    .HasMaxLength(100)
+                    .IsUnicode(false)
+                    .HasColumnName("descripcion");
             });
 
             OnModelCreatingPartial(modelBuilder);

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Clinica.Msql
+namespace Clinica.NewSql
 {
     public partial class PagosRecurrente
     {
