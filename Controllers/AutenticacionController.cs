@@ -11,7 +11,7 @@ using System.Runtime.Intrinsics.Arm;
 using Nest;
 using Microsoft.AspNetCore.Authorization;
 using System.Net.Http.Headers;
-using Clinica.NewSql;
+using Clinica.ModelEntity;
 using Newtonsoft.Json.Linq;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;

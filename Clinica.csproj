@@ -26,7 +26,6 @@
 
   <ItemGroup>
     <Folder Include="Logs\" />
-    <Folder Include="NewSql\" />
   </ItemGroup>
 
   <ItemGroup>

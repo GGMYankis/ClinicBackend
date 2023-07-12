@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Clinica.NewSql
+namespace Clinica.ModelEntity
 {
     public partial class Abono
     {
         public int IdBono { get; set; }
         public int? IdTherapy { get; set; }
-        public int? priceTerapia { get; set; }
-
+        public int? priceTerapia { get; set; } 
         public int? IdPatients { get; set; }
         public DateTime? Fecha { get; set; }
         public decimal? Monto { get; set; }

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Clinica.NewSql
+namespace Clinica.ModelEntity
 {
-    public partial class Config
+    public partial class Configuración
     {
         public int IdKey { get; set; }
         public string? Key { get; set; }

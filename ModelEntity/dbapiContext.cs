@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace Clinica.NewSql
+namespace Clinica.ModelEntity
 {
     public partial class dbapiContext : DbContext
     {
@@ -19,7 +19,7 @@ namespace Clinica.NewSql
         public virtual DbSet<Abono> Abonos { get; set; } = null!;
         public virtual DbSet<AbonosTerapia> AbonosTerapias { get; set; } = null!;
         public virtual DbSet<Attendance> Attendances { get; set; } = null!;
-        public virtual DbSet<Config> Configs { get; set; } = null!;
+        public virtual DbSet<Configuración> Configuracións { get; set; } = null!;
         public virtual DbSet<Consultorio> Consultorios { get; set; } = null!;
         public virtual DbSet<Evaluation> Evaluations { get; set; } = null!;
         public virtual DbSet<IdtherapistIdtherapy> IdtherapistIdtherapies { get; set; } = null!;
@@ -30,9 +30,9 @@ namespace Clinica.NewSql
         public virtual DbSet<Recurrencium> Recurrencia { get; set; } = null!;
         public virtual DbSet<Rol> Rols { get; set; } = null!;
         public virtual DbSet<Therapy> Therapies { get; set; } = null!;
+        public virtual DbSet<TipoAsistencia> TipoAsistencia { get; set; } = null!;
         public virtual DbSet<User> Users { get; set; } = null!;
         public virtual DbSet<Usuario> Usuarios { get; set; } = null!;
-        public virtual DbSet<Zaronasistencium> Zaronasistencia { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -72,7 +72,7 @@ namespace Clinica.NewSql
             modelBuilder.Entity<Attendance>(entity =>
             {
                 entity.HasKey(e => e.IdAsistencias)
-                    .HasName("PK__Attendan__E2B8D1AC97F11714");
+                    .HasName("PK__Attendan__E2B8D1AC953968B7");
 
                 entity.ToTable("Attendance");
 
@@ -87,17 +87,18 @@ namespace Clinica.NewSql
                     .IsUnicode(false)
                     .HasColumnName("remarks");
 
-                entity.Property(e => e.TipoAsistencias)
-                    .HasMaxLength(100)
-                    .IsUnicode(false);
+                entity.HasOne(d => d.TipoAsistenciasNavigation)
+                    .WithMany(p => p.Attendances)
+                    .HasForeignKey(d => d.TipoAsistencias)
+                    .HasConstraintName("FK__Attendanc__TipoA__6E8B6712");
             });
 
-            modelBuilder.Entity<Config>(entity =>
+            modelBuilder.Entity<Configuración>(entity =>
             {
                 entity.HasKey(e => e.IdKey)
                     .HasName("PK__config__3FBEE7401D99C4F3");
 
-                entity.ToTable("config");
+                entity.ToTable("Configuración");
 
                 entity.Property(e => e.IdKey).HasColumnName("idKey");
 
@@ -366,6 +367,18 @@ namespace Clinica.NewSql
                     .IsUnicode(false);
             });
 
+            modelBuilder.Entity<TipoAsistencia>(entity =>
+            {
+                entity.Property(e => e.Id)
+                    .ValueGeneratedNever()
+                    .HasColumnName("id");
+
+                entity.Property(e => e.Descripcion)
+                    .HasMaxLength(100)
+                    .IsUnicode(false)
+                    .HasColumnName("descripcion");
+            });
+
             modelBuilder.Entity<User>(entity =>
             {
                 entity.HasKey(e => e.IdUser)
@@ -427,20 +440,6 @@ namespace Clinica.NewSql
                 entity.Property(e => e.Value)
                     .HasMaxLength(100)
                     .IsUnicode(false);
-            });
-
-            modelBuilder.Entity<Zaronasistencium>(entity =>
-            {
-                entity.ToTable("zaronasistencia");
-
-                entity.Property(e => e.Id)
-                    .ValueGeneratedNever()
-                    .HasColumnName("id");
-
-                entity.Property(e => e.Descripcion)
-                    .HasMaxLength(100)
-                    .IsUnicode(false)
-                    .HasColumnName("descripcion");
             });
 
             OnModelCreatingPartial(modelBuilder);

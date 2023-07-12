@@ -1,4 +1,4 @@
-﻿using Clinica.NewSql;
+﻿using Clinica.ModelEntity;
 
 namespace Clinica.Modelos
 {
@@ -10,6 +10,7 @@ namespace Clinica.Modelos
         public Therapy? Terapia { get; set; }
         public int? IdEvaluacion { get; set; }
         public Consultorio? Consultorio { get; set; }
+        public TipoAsistencia? TipoAsistencia { get; set; }
         public int? Price { get; set; }
         public int? FirstPrice { get; set; }
         public int? IdConsultorio { get; set; }

@@ -1,5 +1,5 @@
 ﻿using Clinica.Modelos;
-using Clinica.NewSql;
+using Clinica.ModelEntity;
 using Elasticsearch.Net;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Serilog;
-using Clinica.NewSql;
+using Clinica.ModelEntity;
 
 var builder = WebApplication.CreateBuilder(args);
 

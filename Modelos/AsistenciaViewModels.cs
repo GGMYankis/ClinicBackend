@@ -8,7 +8,7 @@
         public int? IdTherapy { get; set; }
         public List<DateTime> FechaInicio { get; set; }
         public DateTime? FechaFinal { get; set; }
-        public string? TipoAsistencias { get; set; }
+        public int? TipoAsistencias { get; set; }
         public string? Remarks { get; set; }
     }
 }

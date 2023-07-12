@@ -1,11 +1,12 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Clinica.Modelos;
-using Clinica.NewSql;
+using Clinica.ModelEntity;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Data; 
 using Microsoft.AspNetCore.Authorization;
+using Nest;
 using Nest;
 using static Nest.JoinField;
 using System.Drawing;
@@ -228,7 +229,7 @@ namespace Clinica.Controllers
 
         [HttpPut]
         [Route("EditarAdmin")]
-        public IActionResult EditarAdmin([FromBody] NewSql.User objeto)
+        public IActionResult EditarAdmin([FromBody] ModelEntity.User objeto)
         {
             User oProducto = _dbcontext.Users.Find(objeto.IdUser);
             if (oProducto == null)
@@ -328,7 +329,7 @@ namespace Clinica.Controllers
         [Route("Consultorios")]
         public IActionResult Consultorios()
         {
-            List<NewSql.Consultorio> Lista = new List<NewSql.Consultorio>();
+            List<ModelEntity.Consultorio> Lista = new List<ModelEntity.Consultorio>();
             try
             {
                 Lista = _dbcontext.Consultorios.ToList();
@@ -408,7 +409,7 @@ namespace Clinica.Controllers
 
         [HttpPost]
         [Route("CrearConsultorio")]
-        public IActionResult CrearConsultorio([FromBody] NewSql.Consultorio objeto)
+        public IActionResult CrearConsultorio([FromBody] ModelEntity.Consultorio objeto)
         {
             try
             {
@@ -442,7 +443,7 @@ namespace Clinica.Controllers
 
         [HttpPost]
         [Route("EliminarConsultorio")]
-        public IActionResult EliminarConsultorio([FromBody] NewSql.Consultorio objeto)
+        public IActionResult EliminarConsultorio([FromBody] ModelEntity.Consultorio objeto)
         {
             try
             {
@@ -484,10 +485,10 @@ namespace Clinica.Controllers
 
         [HttpPost]
         [Route("EditarConsultorio")]
-        public IActionResult EditarConsultorio([FromBody] NewSql.Consultorio objeto)
+        public IActionResult EditarConsultorio([FromBody] ModelEntity.Consultorio objeto)
         {
 
-            NewSql.Consultorio oProducto = _dbcontext.Consultorios.Find(objeto.IdConsultorio);
+            ModelEntity.Consultorio oProducto = _dbcontext.Consultorios.Find(objeto.IdConsultorio);
 
             if (oProducto == null)
             {
@@ -841,11 +842,22 @@ namespace Clinica.Controllers
 
                 oProducto.IdPatients = objeto.IdPatients is null ? oProducto.IdPatients : objeto.IdPatients;
                 oProducto.IdTherapy = objeto.IdTherapy is null ? oProducto.IdTherapy : objeto.IdTherapy;
-                oProducto.Price = objeto.Price is null ? oProducto.Price : objeto.Price;
                 oProducto.FirstPrice = objeto.FirstPrice is null ? oProducto.FirstPrice : objeto.FirstPrice;
                 oProducto.IdTerapeuta = objeto.IdTerapeuta is null ? oProducto.IdTerapeuta : objeto.IdTerapeuta;
                 oProducto.Visitas = objeto.Visitas is null ? oProducto.Visitas : objeto.Visitas;
                 oProducto.IdConsultorio = objeto.IdConsultorio is null ? oProducto.IdConsultorio : objeto.IdConsultorio;
+
+
+                if (objeto.Price == 0)
+                {
+                    Therapy therapy = _dbcontext.Therapies.Find(objeto.IdTherapy);
+                    oProducto.Price = therapy.Price;
+                }
+                else
+                {
+                    oProducto.Price = objeto.Price is null ? oProducto.Price : objeto.Price;
+
+                }
 
                 _dbcontext.Evaluations.Update(oProducto);
                  _dbcontext.SaveChanges();
@@ -1028,7 +1040,9 @@ namespace Clinica.Controllers
         }
 
 
-        
+      
+
+
         [Route("ListaEvaluacions")]
         public object ListaEvaluacions([FromBody] Buscar obj)
         {
@@ -1051,42 +1065,50 @@ namespace Clinica.Controllers
                     foreach (var listado in lista)
                     {
 
-
-
-
                         var idEva = listado.IdEvaluation;
 
-                      UserEvaluacion filtrarTerapeuta = olista.Find(t => t.Terapeuta.IdUser == obj.IdTerapeuta);
+                        UserEvaluacion filtrarTerapeuta = olista.Find(t => t.Terapeuta.IdUser == obj.IdTerapeuta);
 
                         if (filtrarTerapeuta == null)
                         {
+
+                            Configuración configs = _dbcontext.Configuracións.FirstOrDefault(c => c.Key == "Falta");
+
+                            var  value = int.Parse(configs.Value);
+
+                            /*
+                         
+                            var total = 2200;
+                               var porcentaje = 20;
+                                 
+                            var totalAPagar = (porcentaje / 100.0) * total;
+
+                            */
+
+                      
+
                             var resultEva = from e in dbContext.Evaluations
-                                            join a in dbContext.Attendances on new { e.IdTerapeuta } equals new { a.IdTerapeuta }
+                                            join a in dbContext.Attendances on e.IdTerapeuta equals a.IdTerapeuta
+                                            join c in dbContext.TipoAsistencia on a.TipoAsistencias equals c.Id
                                             where e.Id == idEva && e.IdTerapeuta == obj.IdTerapeuta
-                                            select new
+                                            join p in dbContext.Patients on a.IdPatients equals p.IdPatients
+                                            join t in dbContext.Therapies on a.IdTherapy equals t.IdTherapy
+                                            join u in dbContext.Users on a.IdTerapeuta equals u.IdUser
+                                            select new Modelos.UserEvaluacion
                                             {
-                                                Evaluation = e,
-                                                Attendance = a
+                                                Paciente = p,
+                                                Terapia = t,
+                                                Terapeuta = u,
+                                                TipoAsistencia = c,
+                                                FechaInicio = a.FechaInicio,
+                                                Price = c.Id == 2 ? (int?)( (value / 100.0) * e.Price) : e.Price
                                             };
 
-                            var resultPatients = from r in resultEva
-                                                 join p in dbContext.Patients on r.Attendance.IdPatients equals p.IdPatients
-                                                 join t in dbContext.Therapies on r.Attendance.IdTherapy equals t.IdTherapy
-                                                 join u in dbContext.Users on r.Attendance.IdTerapeuta equals u.IdUser
-                                                 select new Modelos.UserEvaluacion
-                                                 {
+                             olista = resultEva.ToList();
 
-                                                     Paciente = p,
-                                                     Terapia = t,
-                                                     Terapeuta = u,
-                                                     FechaInicio = r.Attendance.FechaInicio,
-                                                     Price = r.Evaluation.Price
-                                                 };
-
-                            olista.AddRange(resultPatients.ToList());
                         }
 
-                              
+
                     }
 
 
@@ -1097,9 +1119,12 @@ namespace Clinica.Controllers
             {
                 lista = new List<Buscar>();
             }
-                            return olista;
-          
+
+            return olista;
+
         }
+
+        
 
 
         [HttpPost]
@@ -1120,6 +1145,7 @@ namespace Clinica.Controllers
                 {
                     var resultAll = from a in dbContext.Attendances
                                     where a.FechaInicio >= obj.FechaInicio && a.FechaInicio <= obj.FechaFinal
+                                    && a.TipoAsistencias == 1 
                                     orderby a.FechaInicio ascending
                                     select new Attendance
                                     {
@@ -1135,7 +1161,7 @@ namespace Clinica.Controllers
                 {
                     var result = from a in dbContext.Attendances
                                  where a.FechaInicio >= obj.FechaInicio && a.FechaInicio <= obj.FechaFinal &&
-                                 a.IdPatients == obj.IdPatients && a.TipoAsistencias == "1" || a.TipoAsistencias == "3"
+                                 a.IdPatients == obj.IdPatients && a.TipoAsistencias == 1 
                                  orderby a.FechaInicio ascending
                                  select new Attendance
                                  {
@@ -1291,13 +1317,15 @@ namespace Clinica.Controllers
                                              join t in dbcontext.Therapies on e.IdTherapy equals t.IdTherapy
                                              join p in dbcontext.Patients on e.IdPatients equals p.IdPatients
                                              join u in dbcontext.Users on e.IdTerapeuta equals u.IdUser
+                                             join d in dbcontext.TipoAsistencia on e.TipoAsistencias equals d.Id
                                              where e.IdAsistencias == IdAsistencias
                                              select new Modelos.Asistencia
                                              {
                                                  Therapeua = u,
                                                  Terapias = t,
                                                  Pacientes = p,
-                                                 Asistencias = e
+                                                 Asistencias = e,
+                                                 TipoAsistencia = (d.Id == 2 ? "Falta" : (d.Id == 1 ? "Asistio" : (d.Id == 3 ? "Justificada" : "")))
                                              };
 
 
@@ -1401,29 +1429,30 @@ namespace Clinica.Controllers
             return Ok(AttendanceUi);
 
         }
-
+      
 
         [HttpGet]
         [Route("ConfigListado")]
         public IActionResult ConfigListado()
         {
 
-            List<Config> olista = new List<Config>();
+            List<Configuración> olista = new List<Configuración>();
 
 
 
-            olista = _dbcontext.Configs.ToList();
+            olista = _dbcontext.Configuracións.ToList();
           
 
             return Ok(olista);
         }
+      
 
         [HttpPost]
         [Route("Config")]
-        public IActionResult Config([FromBody] Config obj)
+        public IActionResult Config([FromBody] Configuración obj)
         {
    
-                _dbcontext.Configs.Add(obj);
+                _dbcontext.Configuracións.Add(obj);
                 _dbcontext.SaveChanges();
          
             return Ok();
@@ -1432,18 +1461,18 @@ namespace Clinica.Controllers
 
         [HttpPost]
         [Route("ConfigEditar")]
-        public IActionResult ConfigEditar([FromBody] Config obj)
+        public IActionResult ConfigEditar([FromBody] Configuración obj)
         {
 
 
-            Config config = _dbcontext.Configs.Find(obj.IdKey);
+            Configuración config = _dbcontext.Configuracións.Find(obj.IdKey);
 
             if (config != null)
             {
                 config.Key = obj.Key is null ? config.Key : obj.Key;
                 config.Value = obj.Value is null ? config.Value : obj.Value;
 
-                _dbcontext.Configs.Update(config);
+                _dbcontext.Configuracións.Update(config);
                 _dbcontext.SaveChanges();
 
             }
@@ -1454,17 +1483,17 @@ namespace Clinica.Controllers
 
         [HttpPost]
         [Route("ConfigEliminar")]
-        public IActionResult ConfigEliminar([FromBody] Config obj)
+        public IActionResult ConfigEliminar([FromBody] Configuración obj)
         {
 
 
-            Config config = _dbcontext.Configs.Find(obj.IdKey);
+            Configuración config = _dbcontext.Configuracións.Find(obj.IdKey);
 
        
             if(config != null)
             {
 
-                _dbcontext.Configs.Remove(config);
+                _dbcontext.Configuracións.Remove(config);
                 _dbcontext.SaveChanges();
             }
        
@@ -1478,9 +1507,9 @@ namespace Clinica.Controllers
         public IActionResult razon()
         {
 
-            List<Zaronasistencium> olista = new List<Zaronasistencium>();
+            List<TipoAsistencia> olista = new List<TipoAsistencia>();
 
-            olista = _dbcontext.Zaronasistencia.ToList();
+            olista = _dbcontext.TipoAsistencia.ToList();
 
             return Ok(olista);
         }

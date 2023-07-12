@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Clinica.NewSql
+namespace Clinica.ModelEntity
 {
     public partial class Evaluation
     {

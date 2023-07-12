@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Clinica.NewSql
+namespace Clinica.ModelEntity
 {
     public partial class Attendance
     {
@@ -11,7 +11,9 @@ namespace Clinica.NewSql
         public int? IdTherapy { get; set; }
         public DateTime? FechaInicio { get; set; }
         public DateTime? FechaFinal { get; set; }
-        public string? TipoAsistencias { get; set; }
+        public int? TipoAsistencias { get; set; }
         public string? Remarks { get; set; }
+
+        public virtual TipoAsistencia? TipoAsistenciasNavigation { get; set; }
     }
 }

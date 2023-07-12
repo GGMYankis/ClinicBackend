@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Clinica.NewSql;
+using Clinica.ModelEntity;
 using Clinica.Modelos;
 using Microsoft.EntityFrameworkCore;
 
@@ -99,7 +99,7 @@ namespace Clinica.Controllers
                                             Frecuencia = listado.Frecuencia,
                                             Dias = listado.Dias,
 
-                                            Recurrencia = new NewSql.Recurrencium
+                                            Recurrencia = new ModelEntity.Recurrencium
                                             {
                                                 IdRecurrencia = (int)listado.IdRecurrencia
                                             }
@@ -219,7 +219,7 @@ namespace Clinica.Controllers
                                             Frecuencia = listado.Frecuencia,
                                             DiasUi = listado.DiasA,
 
-                                            Recurrencia = new NewSql.Recurrencium
+                                            Recurrencia = new ModelEntity.Recurrencium
                                             {
                                                 IdRecurrencia = (int)listado.IdRecurrencia
                                             }
