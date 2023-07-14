@@ -56,17 +56,17 @@ namespace Clinica.Controllers
         [Route("Login")]
         public IActionResult Login(User usuario)
         {
-            User user = new User();
+            
             var message = "Usuario no encontardo";
-            user = _dbcontext.Users.FirstOrDefault(u => u.Email == usuario.Email && u.Password == usuario.Password);
+            User user = _dbcontext.Users.FirstOrDefault(u => u.Email == usuario.Email && u.Password == usuario.Password);
+
             if(user == null) {
                 return BadRequest(message);
             }
                 var keyBytes = Encoding.ASCII.GetBytes(secretKey);
                 var claims = new ClaimsIdentity();
-            claims.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.IdUser.ToString()));
-
-            claims.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Names));
+                claims.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.IdUser.ToString()));
+                claims.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Names));
                 claims.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Email));
                 var tokenDescriptor = new SecurityTokenDescriptor
                 {

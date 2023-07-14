@@ -1078,15 +1078,13 @@ namespace Clinica.Controllers
 
                             /*
                          
-                            var total = 2200;
-                               var porcentaje = 20;
-                                 
-                            var totalAPagar = (porcentaje / 100.0) * total;
+                                var total = 2200;
+                                   var porcentaje = 20;                               
+                                var totalAPagar = (porcentaje / 100.0) * total;
 
                             */
 
-                      
-
+                     
                             var resultEva = from e in dbContext.Evaluations
                                             join a in dbContext.Attendances on e.IdTerapeuta equals a.IdTerapeuta
                                             join c in dbContext.TipoAsistencia on a.TipoAsistencias equals c.Id
@@ -1101,18 +1099,17 @@ namespace Clinica.Controllers
                                                 Terapeuta = u,
                                                 TipoAsistencia = c,
                                                 FechaInicio = a.FechaInicio,
-                                                Price = c.Id == 2 ? (int?)( (value / 100.0) * e.Price) : e.Price
+                                                Price = c.Id == 1 ? (int?)((t.Porcentaje / 100.0) * e.Price) : (int?)((value / 100.0) * e.Price)
+
+
+                                                //Price = c.Id == 2 ? (int?)( (value / 100.0) * e.Price) : e.Price
                                             };
 
                              olista = resultEva.ToList();
 
                         }
 
-
                     }
-
-
-
                 }
             }
             catch (Exception ex)
