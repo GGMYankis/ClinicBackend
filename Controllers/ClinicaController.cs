@@ -1099,7 +1099,7 @@ namespace Clinica.Controllers
                                                 Terapeuta = u,
                                                 TipoAsistencia = c,
                                                 FechaInicio = a.FechaInicio,
-                                                Price = c.Id == 1 ? (int?)((t.Porcentaje / 100.0) * e.Price) : (int?)((value / 100.0) * e.Price)
+                                                Price = c.Id == 1 ? (int?)((t.Porcentaje / 100.0) * e.Price) : c.Id == 2 ?  (int?)((value / 100.0) * e.Price) : (int?)0
 
 
                                                 //Price = c.Id == 2 ? (int?)( (value / 100.0) * e.Price) : e.Price
