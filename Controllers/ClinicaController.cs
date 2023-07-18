@@ -61,6 +61,7 @@ namespace Clinica.Controllers
             try
             {
                 Lista = _dbcontext.Patients.ToList();
+
                 return Ok(Lista);
             }
             catch (Exception ex)
@@ -68,6 +69,8 @@ namespace Clinica.Controllers
                 return StatusCode(StatusCodes.Status200OK, new { mensaje = ex.Message, Lista });
             }
         }
+
+
         [HttpGet]
         [Route("Listas")]
         public IActionResult Listas()
@@ -397,6 +400,19 @@ namespace Clinica.Controllers
         {
             try
             {
+
+                User usuario = _dbcontext.Users.FirstOrDefault( u => u.Email == objeto.Email);
+
+                if (usuario != null)
+                {
+                    string mensaje = "El correo ya existe.";
+                    return BadRequest(new { error = mensaje });
+                }
+
+
+
+
+
                 _dbcontext.Users.Add(objeto);
                 _dbcontext.SaveChanges();
                 return StatusCode(StatusCodes.Status200OK, new { mensaje = "ok" });
@@ -1018,7 +1034,8 @@ namespace Clinica.Controllers
                                         {
                                             Label = t.Label
                                         },
-                                      
+                                        Dias = listado.Dias,
+
                                         Paciente = new Patient
                                         {
                                             Name = p.Name
@@ -1512,6 +1529,10 @@ namespace Clinica.Controllers
         }
 
 
-    }
+
+      
+
+
+        }
 }
 

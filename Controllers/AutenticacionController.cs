@@ -52,6 +52,8 @@ namespace Clinica.Controllers
             }
         }
 
+
+
         [HttpPost]
         [Route("Login")]
         public IActionResult Login(User usuario)
@@ -61,24 +63,37 @@ namespace Clinica.Controllers
             User user = _dbcontext.Users.FirstOrDefault(u => u.Email == usuario.Email && u.Password == usuario.Password);
 
             if(user == null) {
+
                 return BadRequest(message);
+
             }
-                var keyBytes = Encoding.ASCII.GetBytes(secretKey);
-                var claims = new ClaimsIdentity();
-                claims.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.IdUser.ToString()));
-                claims.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Names));
-                claims.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Email));
-                var tokenDescriptor = new SecurityTokenDescriptor
-                {
-                    Subject = claims,
-                    Expires = DateTime.UtcNow.AddMinutes(30),
-                    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(keyBytes), SecurityAlgorithms.HmacSha256Signature)
-                };
-                var tokenHandler = new JwtSecurityTokenHandler();
-                var tokenConfig = tokenHandler.CreateToken(tokenDescriptor);
-                string tokencreado = tokenHandler.WriteToken(tokenConfig);
+
+                var tokencreado = Token(user);
+
                 return StatusCode(StatusCodes.Status200OK, new { tokencreado, user });      
         }
+
+
+
+        private string Token(ModelEntity.User user)
+        {
+            var keyBytes = Encoding.ASCII.GetBytes(secretKey);
+            var claims = new ClaimsIdentity();
+            claims.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.IdUser.ToString()));
+            claims.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Names));
+            claims.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Email));
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = claims,
+                Expires = DateTime.UtcNow.AddMinutes(30),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(keyBytes), SecurityAlgorithms.HmacSha256Signature)
+            };
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var tokenConfig = tokenHandler.CreateToken(tokenDescriptor);
+            string tokencreado = tokenHandler.WriteToken(tokenConfig);
+            return tokencreado;
+        }
+
 
         [HttpPost]
         [Route("GastosGanancia")]
