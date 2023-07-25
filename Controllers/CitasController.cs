@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Clinica.ModelEntity;
 using Clinica.Modelos;
 using Microsoft.EntityFrameworkCore;
+using Nest;
 
 namespace Clinica.Controllers
 {
@@ -17,7 +18,66 @@ namespace Clinica.Controllers
         {
             _dbcontext = _context;
         }
-        
+
+        [HttpPost]
+        [Route("PacientesTerapeuta")]
+        public IActionResult PacientesTerapeuta([FromBody] User obj)
+        {
+
+            List<Evaluation> Citas = new List<Evaluation>();
+            List<Patient>? Paciente = new List<Patient>();
+
+            using (var context = _dbcontext)
+            {
+                var result = from c in context.Evaluations
+                             where c.IdTerapeuta == obj.IdUser
+                             select new Evaluation
+                             {
+                                 IdPatients = c.IdPatients
+                             };
+
+                Citas.AddRange(result);
+
+
+                foreach (var listado in Citas)
+                {
+                    var paciente = from p in context.Patients
+                                   where p.IdPatients == listado.IdPatients
+                                   select new Patient
+                                   {
+                                       IdPatients = p.IdPatients,
+                                       Name = p.Name,
+                                       Sex = p.Sex,
+                                       ParentsName = p.ParentsName,
+                                       ParentOrGuardianPhoneNumber = p.ParentOrGuardianPhoneNumber,
+                                       NumberMothers = p.NumberMothers,
+                                       DateOfBirth = p.DateOfBirth,
+                                       Age = p.Age,
+                                       EducationalInstitution = p.EducationalInstitution,
+                                       Course = p.Course,
+                                       WhoRefers = p.WhoRefers,
+                                       FamilySettings = p.FamilySettings,
+                                       TherapiesOrServiceYouWillReceiveAtTheCenter = p.TherapiesOrServiceYouWillReceiveAtTheCenter,
+                                       Diagnosis = p.Diagnosis,
+                                       Recommendations = p.Recommendations,
+                                       FamilyMembersConcerns = p.FamilyMembersConcerns,
+                                       SpecificMedicalCondition = p.SpecificMedicalCondition,
+                                       Other = p.Other,
+                                       Activo = p.Activo,
+                                       FechaIngreso = p.FechaIngreso
+                                   };
+
+
+                       Paciente.AddRange(paciente.ToList());
+
+
+                }
+
+            }
+
+            return Ok(Paciente);
+
+        }
 
         [HttpGet]
         [Route("CitasNoUnicas")]
@@ -118,8 +178,6 @@ namespace Clinica.Controllers
             }
             return olista;
         }
-
-
 
 
         [HttpGet]

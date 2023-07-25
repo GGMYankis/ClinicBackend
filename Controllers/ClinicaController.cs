@@ -70,6 +70,8 @@ namespace Clinica.Controllers
             }
         }
 
+       
+
 
         [HttpGet]
         [Route("Listas")]
@@ -118,7 +120,8 @@ namespace Clinica.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status200OK, new { mensaje = ex.Message });
+                var mensaje = "Hubo un error al crear el paciente";
+                return BadRequest(mensaje);
             }
         }
 
@@ -545,40 +548,7 @@ namespace Clinica.Controllers
         }
 
 
-        [HttpPost]
-        [Route("BuscarPacientePorTerapeuta")]
-        public async Task<IActionResult> BuscarPacientePorTerapeuta(IdtherapistIdtherapy terapeutaId)
-        {
-            try
-            {
-                List<Probar> viewModal = new List<Probar>();
-                var evaluaciones = await _dbcontext.Evaluations
-                .Where(e => e.IdTerapeuta == terapeutaId.Idterapeuta)
-                .Select(e => e.IdPatients) 
-                .Distinct()
-                .ToListAsync();
-
-                            if (evaluaciones != null)
-                            {
-                               foreach (var cita in evaluaciones)
-                               {
-                                       var resPaciente = await Filtrar(cita);
-                                      Probar nuevoObjeto = new Probar();
-                                      nuevoObjeto.NombrePaciente = resPaciente;
-                                     viewModal.Add(nuevoObjeto);
-                               }
-                            }
-
-                    return Ok(viewModal);
-            }
-            catch (Exception ex)
-            {
-                return Ok(ex);
-            }
-
-        }
-
-   
+     
 
 
         [HttpPost]
@@ -712,6 +682,16 @@ namespace Clinica.Controllers
             {
                 NoContent();
             }
+
+            //var citas = _dbcontext.Evaluations.Where(c => c.IdPatients == IdPaciente.IdPatients).ToList();
+
+            //if(citas != null)
+            //{
+            //    var mensaje = "Este paciente tiene una cita en la agenda";
+
+            //    return BadRequest(mensaje); 
+            //}
+
             _dbcontext.Remove(paciente);
             _dbcontext.SaveChanges();
             return Ok();
