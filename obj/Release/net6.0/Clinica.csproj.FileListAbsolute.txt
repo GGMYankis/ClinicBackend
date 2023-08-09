@@ -167,3 +167,6 @@ C:\Users\LENOVO\Documents\GitHub\ClinicBackend\bin\Release\net6.0\ViewModal.dll
 C:\Users\LENOVO\Documents\GitHub\ClinicBackend\bin\Release\net6.0\AllServicios.pdb
 C:\Users\LENOVO\Documents\GitHub\ClinicBackend\bin\Release\net6.0\ConexionSql.pdb
 C:\Users\LENOVO\Documents\GitHub\ClinicBackend\bin\Release\net6.0\ViewModal.pdb
+C:\Users\giancarlos\Documents\GitHub\ClinicBackend-2\obj\Release\net6.0\Clinica.dll
+C:\Users\giancarlos\Documents\GitHub\ClinicBackend-2\obj\Release\net6.0\refint\Clinica.dll
+C:\Users\giancarlos\Documents\GitHub\ClinicBackend-2\obj\Release\net6.0\Clinica.pdb

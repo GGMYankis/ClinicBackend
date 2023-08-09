@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Clinica", "Clinica.csproj",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConexionSql", "..\ConexionSql\ConexionSql.csproj", "{42C0F774-D674-4A1C-A62A-DF298DC73B59}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AllServicios", "..\Servicios\AllServicios.csproj", "{766459E1-50A4-4271-9774-70B9DCE9633B}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ViewModal", "..\ViewModal\ViewModal.csproj", "{A169121E-96A4-4B12-9FCF-8F7932B6A6F7}"
 EndProject
 Global
@@ -25,10 +23,6 @@ Global
 		{42C0F774-D674-4A1C-A62A-DF298DC73B59}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{42C0F774-D674-4A1C-A62A-DF298DC73B59}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{42C0F774-D674-4A1C-A62A-DF298DC73B59}.Release|Any CPU.Build.0 = Release|Any CPU
-		{766459E1-50A4-4271-9774-70B9DCE9633B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{766459E1-50A4-4271-9774-70B9DCE9633B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{766459E1-50A4-4271-9774-70B9DCE9633B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{766459E1-50A4-4271-9774-70B9DCE9633B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A169121E-96A4-4B12-9FCF-8F7932B6A6F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A169121E-96A4-4B12-9FCF-8F7932B6A6F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A169121E-96A4-4B12-9FCF-8F7932B6A6F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
