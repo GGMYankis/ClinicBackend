@@ -1,7 +1,7 @@
 {
   "version": 2,
-  "dgSpecHash": "WwuB0qSPF10k7JErXkCUXIL4i2yPNV7bF2wxck50LduBKNSwRMcARtG3D7UGndsor3KRAx+uWO0OZXnJ3N4xnw==",
-  "success": false,
+  "dgSpecHash": "aliRKkYtWPuBv8HNMKPUgZQ03IURtyEMuvNl457UYuXqCDUoZ2Dq7dGr+ayTMaYnNIwKGSOGq5HECTBVO+bU9A==",
+  "success": true,
   "projectFilePath": "C:\\Users\\giancarlos\\Documents\\GitHub\\ClinicBackend-2\\Clinica.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\giancarlos\\.nuget\\packages\\elasticsearch.net\\7.17.5\\elasticsearch.net.7.17.5.nupkg.sha512",
@@ -80,15 +80,5 @@
     "C:\\Users\\giancarlos\\.nuget\\packages\\system.text.json\\4.6.0\\system.text.json.4.6.0.nupkg.sha512",
     "C:\\Users\\giancarlos\\.nuget\\packages\\system.windows.extensions\\4.7.0\\system.windows.extensions.4.7.0.nupkg.sha512"
   ],
-  "logs": [
-    {
-      "code": "NU1104",
-      "level": "Error",
-      "message": "Unable to find project 'C:\\Users\\giancarlos\\Documents\\GitHub\\Servicios\\AllServicios.csproj'. Check that the project reference is valid and that the project file exists.",
-      "libraryId": "C:\\Users\\giancarlos\\Documents\\GitHub\\Servicios\\AllServicios.csproj",
-      "targetGraphs": [
-        "net6.0"
-      ]
-    }
-  ]
+  "logs": []
 }

@@ -28,11 +28,7 @@
         "frameworks": {
           "net6.0": {
             "targetAlias": "net6.0",
-            "projectReferences": {
-              "C:\\Users\\giancarlos\\Documents\\GitHub\\Servicios\\AllServicios.csproj": {
-                "projectPath": "C:\\Users\\giancarlos\\Documents\\GitHub\\Servicios\\AllServicios.csproj"
-              }
-            }
+            "projectReferences": {}
           }
         },
         "warningProperties": {

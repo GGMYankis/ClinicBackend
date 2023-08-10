@@ -3196,7 +3196,6 @@
   },
   "projectFileDependencyGroups": {
     "net6.0": [
-      "C:\\Users\\giancarlos\\Documents\\GitHub\\Servicios\\AllServicios.csproj",
       "Microsoft.AspNetCore.Authentication.JwtBearer >= 6.0.3",
       "Microsoft.EntityFrameworkCore.SqlServer >= 6.0.4",
       "Microsoft.EntityFrameworkCore.Tools >= 6.0.4",
@@ -3238,11 +3237,7 @@
       "frameworks": {
         "net6.0": {
           "targetAlias": "net6.0",
-          "projectReferences": {
-            "C:\\Users\\giancarlos\\Documents\\GitHub\\Servicios\\AllServicios.csproj": {
-              "projectPath": "C:\\Users\\giancarlos\\Documents\\GitHub\\Servicios\\AllServicios.csproj"
-            }
-          }
+          "projectReferences": {}
         }
       },
       "warningProperties": {
@@ -3328,16 +3323,5 @@
         "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.306\\RuntimeIdentifierGraph.json"
       }
     }
-  },
-  "logs": [
-    {
-      "code": "NU1104",
-      "level": "Error",
-      "message": "Unable to find project 'C:\\Users\\giancarlos\\Documents\\GitHub\\Servicios\\AllServicios.csproj'. Check that the project reference is valid and that the project file exists.",
-      "libraryId": "C:\\Users\\giancarlos\\Documents\\GitHub\\Servicios\\AllServicios.csproj",
-      "targetGraphs": [
-        "net6.0"
-      ]
-    }
-  ]
+  }
 }
