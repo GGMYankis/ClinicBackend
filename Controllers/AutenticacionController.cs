@@ -84,6 +84,7 @@ namespace Clinica.Controllers
             claims.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.IdUser.ToString()));
             claims.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Names));
             claims.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Email));
+            claims.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.IdRol.ToString()));
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = claims,
@@ -141,6 +142,10 @@ namespace Clinica.Controllers
             }
             return lista;
         }
+
+
+
+       
 
 
 }

@@ -34,7 +34,6 @@ namespace Clinica.Controllers
             cadenaSQL = config.GetConnectionString("CadenaSQL");
             _dbcontext = _context;
             _logger = logger;
-
         }
 
         [HttpGet]
@@ -301,16 +300,12 @@ namespace Clinica.Controllers
 
 
 
-        [HttpPost]
-        [Route("fechas")]
-        public IActionResult Fechas([FromBody] ListaFecha objeto)
-        {
-
-
-
-            return Ok();
-
-        }
+        //[HttpPost]
+        //[Route("fechas")]
+        //public IActionResult Fechas([FromBody] ListaFecha objeto)
+        //{
+        //    return Ok();
+        //}
 
 
 
